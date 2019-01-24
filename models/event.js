@@ -1,6 +1,4 @@
-
 const mongoose = require('mongoose')
-
 
 const Event = mongoose.model('Event', {
   content: String,
