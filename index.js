@@ -21,6 +21,7 @@ app.use(bodyParser.json())
 
 app.use(express.static('build'))
 app.use(middleware.logger)
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello backend!</h1> <a href="/events">Events</a>')
 })

@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - node
+script:
+  - npm run test-with-coverage
+env:
+  matrix:
+    secure: I5xVfxLToJmOnhgrW0ZDRYSwjCxL6PZSI4z1mZe6nYBuxL4YVbRJSvUxxzHOXwN214oGWl1ZRqdJraoh3KM6S/XqBG4KiGksrHfjl8mo3TuUs/oE43K2fzi25u9RT5PXi9yxCpMhpZfbpC5EM8eUc/3s+loHqruRNyPleTepPIQJQPov6ra2B5DBmHEhygz4u9IVJug7KZhFYP7XAZ1zakOS1MhfeUuv/okZ9XB1+3lAOl5n4q/XTEGflYjKC0pjCM9+HAUD9PbHKw3lNWyDiSJww4+LowCjGDT2YgHCt0aw+70EbWaYbRb/4xB7xhfUIqO+/7HrIfeLUT1j52zr/Qaa8ED/3w9p6YtjgXPaL74YVY+zDGmXaWMXcUKf+d2KfR1JDoTNvbEHhFQG3DZwOUkS7L95Vk9cEYBkF6zX7iS/3cW23x5E/pz04n2AJP5Br2iD4KPPYAPmpbtZ3f7QJfnWkIQ/vkTCq6gYK2vDMTge6VCia48PTTVtE++uckAUoy43ATM0Tov835tXYotyHaZOxApe0ZSgqtq+HrRhrriOuLNlqUtnjnIYPOAP0qsyh+HGSTizJ2LyFM1cccz4C68uJgA2YoIKrpRgKMRVmaeMFGnpzPXtS++WQ50aRqoKgRS8JSTwGidPAoLBM67ihpy1T+bY5zr1ehe3zW5gVNI=
