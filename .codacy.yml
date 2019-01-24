@@ -1,0 +1,5 @@
+exclude_paths:
+  - 'package.json'
+  - 'package-lock.json'
+  - '*.config.js'
+  - 'README.md'

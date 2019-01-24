@@ -4,18 +4,30 @@
   "description": "Backend for sukeltaja-app",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "watch": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cross-env NODE_ENV=production node index.js",
+    "watch": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose",
+    "lint": "eslint .",
+    "test-with-coverage": "cross-env NODE_ENV=test jest --coverage --verbose && cat ./coverage/lcov.info | codacy-coverage"
   },
   "author": "Waltteri Metsola",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "mongoose": "^5.4.6"
   },
   "devDependencies": {
-    "nodemon": "^1.18.9"
+    "babel-eslint": "^10.0.1",
+    "codacy-coverage": "^3.4.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.12.1",
+    "jest": "^23.6.0",
+    "nodemon": "^1.18.9",
+    "supertest": "^3.4.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
