@@ -1,0 +1,11 @@
+POST http://localhost:3001/events
+content-type: application/json
+
+{
+    "_id": "",
+    "content": "Sunnuntai-sukeltelua, nähtiin sorsa",
+    "startdate": "",
+    "enddate": "",
+    "user": "Sanna Sukeltaja",
+    "__v": 0
+}
