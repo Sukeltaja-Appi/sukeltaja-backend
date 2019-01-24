@@ -4,6 +4,7 @@ module.exports = {
   "testEnvironment": "node",
   "coveragePathIgnorePatterns": [
     ...defaults.coveragePathIgnorePatterns,
-    ".config.js"
+    ".config.js",
+    "middleware.js"
   ]
 }
