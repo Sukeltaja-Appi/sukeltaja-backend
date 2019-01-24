@@ -1,8 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
 const app = express()
-const Event = require('./models/event')
-const User = require('./models/user')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const http = require('http')
@@ -48,11 +46,6 @@ server.listen(config.port, () => {
     app, server
   }
 
-/*
-const port = config.port
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
-})
-*/
+
 
 
