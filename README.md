@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Sukeltaja-App/sukeltaja-backend.svg?branch=master)](https://travis-ci.org/Sukeltaja-App/sukeltaja-backend)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a73bbac9673a473092af6fa884489501)](https://app.codacy.com/app/luupanu/sukeltaja-backend?utm_source=github.com&utm_medium=referral&utm_content=Sukeltaja-App/sukeltaja-backend&utm_campaign=Badge_Grade_Settings)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/581f1d911cec46adbaede7cca62ed9ab)](https://www.codacy.com/app/luupanu/sukeltaja-backend?utm_source=github.com&utm_medium=referral&utm_content=Sukeltaja-App/sukeltaja-backend&utm_campaign=Badge_Coverage)
 
 **STATUS: Development in progress.**
 
