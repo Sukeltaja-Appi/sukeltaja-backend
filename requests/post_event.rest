@@ -3,9 +3,9 @@ content-type: application/json
 
 {
     "_id": "",
-    "content": "Sunnuntai-sukeltelua, nähtiin sorsa",
+    "content": "Hai puraisi jalkani irti",
     "startdate": "",
     "enddate": "",
-    "user": "Sanna Sukeltaja",
+    "user": "5c4b4ef22db3bf1bc4e1d381",
     "__v": 0
 }
