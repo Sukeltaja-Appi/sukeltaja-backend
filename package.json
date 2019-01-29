@@ -13,10 +13,13 @@
   "author": "Waltteri Metsola",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "mongoose": "^5.4.6"
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.4.6",
+    "mongoose-unique-validator": "^2.0.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",

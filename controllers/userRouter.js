@@ -1,5 +1,6 @@
 const userRouter = require('express').Router()
 const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 
 // Returns all current events from database as JSON
@@ -12,6 +13,13 @@ userRouter.get('/', async (req, res) => {
   res.json(users.map(User.format))
 })
 
+userRouter.get('/:id', async (req, res) => {
+  const user = await User.findById(req.params.id)
+    .populate('events', { content: 1, startdate: 1, enddate: 1 })
+
+  res.json(User.format(user))
+})
+
 userRouter.post('/', async (req, res) => {
   try{
     console.log(req.body)
@@ -21,14 +29,13 @@ userRouter.post('/', async (req, res) => {
     if (body.username === undefined || body.password === undefined){
       return res.status(400).json({ error: 'user or password missing' })
     }
-    const existingUser = await User.find({ username: body.username })
-    if (existingUser.length>0) {
-      return res.status(400).json({ error: 'username must be unique' })
-    }
+
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
     const user = new User({
       username: body.username,
-      password: body.password,
+      password: passwordHash,
       events: body.events
     })
 

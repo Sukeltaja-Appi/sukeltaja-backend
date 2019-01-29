@@ -1,0 +1,4 @@
+GET http://localhost:3001/events/5c50669a1392753f405e7ecf
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0ODc3NDQyNH0.rpPRROtkzKTCOAuJ-yWAjuJ3_OMvMDgWrjfn6EuYezM
+

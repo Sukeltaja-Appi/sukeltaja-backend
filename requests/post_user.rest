@@ -3,8 +3,8 @@ content-type: application/json
 
 {
     "_id": "",
-    "username": "SeijaSukeltaja",
-    "password": "Kukka123",
+    "username": "KalleKapteeni",
+    "password": "123123salasana",
     "events": [],
     "__v": 0
 }
