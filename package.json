@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "test-with-coverage": "cross-env NODE_ENV=test jest --coverage --verbose && cat ./coverage/lcov.info | codacy-coverage"
   },
-  "author": "Waltteri Metsola",
+  "author": "Sukeltaja-Tiimi",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^3.0.3",

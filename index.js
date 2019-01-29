@@ -20,6 +20,7 @@ mongoose
 
 app.use(bodyParser.json())
 
+
 app.use(express.static('build'))
 app.use(middleware.logger)
 
