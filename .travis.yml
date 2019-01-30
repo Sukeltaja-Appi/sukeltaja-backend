@@ -12,4 +12,6 @@ deploy:
   provider: heroku
   api_key:
     secure: DMHSz/4nIUwPOrY7V+sWVlGRyldziMiAsOt8P+Qg74RCOFbIzCYrKfSwIR45/9UzTdEP4/WOldEep8gs3fKjk3QxHYsLT/jJ3LMsuNU3fka2e+gjY4xgz/OGv3MuX4mxxaXcbbFSO1paHKbAZZIqvA0rWuGMXr96NSpwWHU7OCdCc37HR+ogPvfjbzC0iUNWWxOpV4HXpaQthOENv1nZdLZ/AmQEv0Ul87puhdS6OtipTakacJwQzghTsC6BMTY817dyMEgYOh8rDHxqs1KLIhCUHe6qfaDilAkN7Kn64x+EIhEVuZvoAqQ6A7w7l9uxyy3xM9KySoieD8rZNyA9h4Y8rRp7ixl3HWlvjqiBcQNSzVaYI8Xkaz5P/52vQuGUxwjJc+kNKUhTAAn35YnKE7cmfv5003hrqBRJRzJm5xFL/KO1u41Js80rmfg2eo61fiqaT1fAc+R+aTHm5gW/y2uHJoTD4+4Nhl6VdGwaA0m0fOCqgThSpgXdAUAzvIbTSTzj1a21drEAlo+oT28PUmkfqUmx3bmHeBdIK6hCkFJeJyPU6mOpVr8PywEFsTZI/cFEAWFd23oUNBtO+Ex9cJ9sxmyWyId8gJ9rsvpGXD+VGvI5gg/ZblKycWt4ylPXCPIAfSYMobdpOn2HVJ32otvbCTBaBGpnaup22kuTYgA=
-    app: sukeltaja
+    app:
+      master: sukeltaja
+      fastfix: sukeltaja
