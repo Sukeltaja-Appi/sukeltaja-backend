@@ -15,6 +15,11 @@ module.exports = {
       "error",
       2
     ],
+    "globals": {
+      "test": true,
+      "expect": true,
+      "describe": true
+    },
     "linebreak-style": [
       "error",
       "unix"

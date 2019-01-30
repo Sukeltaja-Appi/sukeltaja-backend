@@ -1,45 +1,50 @@
 const userRouter = require('express').Router()
 const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
-const formatUser = (user) => {
-  const formattedUser = { ...user._doc, id: user._id }
-  delete formattedUser._id
-  delete formattedUser.__v
-
-  return formattedUser
-}
 
 // Returns all current events from database as JSON
 
-userRouter.get('/', (req, res) => {
-
-  User
+userRouter.get('/', async (req, res) => {
+  const users = await User
     .find({})
-    .then(users => {
-      res.json(users.map(formatUser))
-    })
+    .populate('events', { content: 1, startdate: 1, enddate: 1 })
+
+  res.json(users.map(User.format))
 })
 
-userRouter.post('/', (req, res) => {
-  console.log(req.body)
+userRouter.get('/:id', async (req, res) => {
+  const user = await User.findById(req.params.id)
+    .populate('events', { content: 1, startdate: 1, enddate: 1 })
 
-  const body = req.body
+  res.json(User.format(user))
+})
 
-  if (body.username === undefined || body.password === undefined){
-    return res.status(400).json({ error: 'user or password missing' })
-  }
+userRouter.post('/', async (req, res) => {
+  try{
+    console.log(req.body)
 
-  const user = new User({
-    username: body.username,
-    password: body.password,
-    events: body.events
-  })
+    const body = req.body
 
-  user
-    .save()
-    .then(savedUser => {
-      res.json(formatUser(savedUser))
+    if (body.username === undefined || body.password === undefined){
+      return res.status(400).json({ error: 'user or password missing' })
+    }
+
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(body.password, saltRounds)
+
+    const user = new User({
+      username: body.username,
+      password: passwordHash,
+      events: body.events
     })
+
+    const savedUser = await user.save()
+    res.json(User.format(savedUser))
+  } catch (exception) {
+    console.log(exception)
+    res.status(500).json({ error: 'something went wrong...' })
+  }
 })
 
 module.exports = userRouter

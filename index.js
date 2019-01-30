@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const middleware = require('./utils/middleware')
 const eventRouter = require('./controllers/eventRouter')
 const userRouter = require('./controllers/userRouter')
+const loginRouter = require('./controllers/loginRouter')
 
 mongoose
   .connect(config.mongoUrl,  { useNewUrlParser: true })
@@ -19,6 +20,7 @@ mongoose
 
 app.use(bodyParser.json())
 
+
 app.use(express.static('build'))
 app.use(middleware.logger)
 
@@ -27,6 +29,7 @@ app.get('/', (req, res) => {
 })
 app.use('/events', eventRouter)
 app.use('/users', userRouter)
+app.use('/login', loginRouter)
 
 const server = http.createServer(app)
 
