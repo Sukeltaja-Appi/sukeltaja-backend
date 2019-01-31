@@ -12,5 +12,5 @@ deploy:
   provider: heroku
   api_key:
     secure: N/PMRrb/1ulNcDQT/Wh0CyhGmyVy/RWDem7D42XwJjoffpX7MmZ0mMs6uyXxnCDehqUB3BAOIuR/yCLjL0K/kaQiuyCGjyFHm5JGunom+UGHrTWiH7s4WarzbJWWiTpspEWR4MHPwwK4vkeBlZn3TKT5cJM5SC/Akulfjr2Z9Az8G8DJ3kAb9wEwtNSYBE9LKpobX35axv9RMHemVZwnvcREu4cJmGbyR8YaF8jA7RbMeWIBmUl8Y1J/JtwOGqjMQ+lQ8XaiMrIzCY1FhVcRr7g35OzUW7Ajv+DZ+IjnuVtOh/yMLqMfnx38v1Yt1XeLe9SOuPes0nie5/gkmDS703DX9DhydCjiC5gQQoq/HNyUfu4FlTZpUATa6Mh6QuC0EY4QjalIXRVOR7FfLuxHLwpnwwVmnEkK8o7DmCEf0TRVc5VBW3HgyZZggK0WLJXduRaQgTyyu5GV7Awdbtmd0NGXpbwNLMvqqitIgMOkmXHG0DgipWCmOECkVP+ufoopeewCLHtMJ5MnU4gtBTPFknZfTaZ7Q20uC0G3gdwJbA/xekKs/UVM5el6acksLUnzjqX6K8mLabWrBlhr6XlWC+sEuodV/0Dy+Xjs12w7pkME/fO51LXEyc9E6bhcfddmDhnHEY/JnH2aCmpVVDc/cZ3JXDFk2QgAw5tffY68cew=
-    app:
-      master: sukeltaja
+  app:
+    master: sukeltaja
