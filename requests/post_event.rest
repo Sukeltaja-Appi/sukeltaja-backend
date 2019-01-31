@@ -1,9 +1,10 @@
-POST http://localhost:3001/events/test
+POST http://localhost:3001/events
 content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0ODc3MjIyOX0.2R_jraszM7emF0y6YmfXa3ZTrPE0Phdw795VdN0wCvw
 
 {
     "_id": "",
-    "content": "Hai vei koko käden",
+    "content": "Hai vei kädetkin",
     "startdate": "",
     "enddate": "",
     "user": "5c50563f2da79c31a0a4e7fe",
