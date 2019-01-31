@@ -21,7 +21,7 @@ userRouter.get('/:id', async (req, res) => {
 })
 
 userRouter.post('/', async (req, res) => {
-  try{
+  try {
     console.log(req.body)
 
     const body = req.body

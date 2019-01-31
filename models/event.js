@@ -8,7 +8,7 @@ const eventSchema = new mongoose.Schema({
 })
 
 eventSchema.statics.format = (event) => {
-  return{
+  return {
     id: event._id,
     content: event.content,
     startdate: event.startdate,

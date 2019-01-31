@@ -9,9 +9,13 @@ const eventRouter = require('./controllers/eventRouter')
 const userRouter = require('./controllers/userRouter')
 const loginRouter = require('./controllers/loginRouter')
 
+mongoose.set('useNewUrlParser', true)
+mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
+
 mongoose
-  .connect(config.mongoUrl,  { useNewUrlParser: true })
-  .then( () => {
+  .connect(config.mongoUrl)
+  .then(() => {
     console.log('connected to databases', config.mongoUrl)
   })
   .catch( err => {
