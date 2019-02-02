@@ -3,9 +3,11 @@ const User = require('../models/user')
 
 const getTokenFrom = (req) => {
   const authorization = req.get('authorization')
+
   if (authorization && authorization.toLowerCase().startsWith('bearer ')){
     return authorization.substring(7)
   }
+
   return null
 }
 
@@ -20,6 +22,7 @@ const requireAuthentication = async (req, res, next) => {
       return res.status(401).json({ error: exception.message })
     } else {
       console.log(exception)
+
       return res.status(500).json({ error: 'something went wrong...' })
     }
   }

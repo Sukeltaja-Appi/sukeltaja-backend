@@ -2,7 +2,6 @@ const userRouter = require('express').Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
-
 // Returns all current events from database as JSON
 
 userRouter.get('/', async (req, res) => {
@@ -22,8 +21,6 @@ userRouter.get('/:id', async (req, res) => {
 
 userRouter.post('/', async (req, res) => {
   try {
-    console.log(req.body)
-
     const body = req.body
 
     if (body.username === undefined || body.password === undefined){
@@ -40,7 +37,9 @@ userRouter.post('/', async (req, res) => {
     })
 
     const savedUser = await user.save()
+
     res.json(User.format(savedUser))
+
   } catch (exception) {
     console.log(exception)
     res.status(500).json({ error: 'something went wrong...' })
