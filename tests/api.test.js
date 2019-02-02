@@ -31,8 +31,8 @@ describe('user tests', async () => {
     expect(response.body[2].events.length).toBe(2)
   })
 })
-describe('event tests', async () => {
 
+describe('event tests', async () => {
 
   test('events are returned as json', async () => {
     await api

@@ -71,7 +71,7 @@ eventRouter.put('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(req.params.id,{ content, startdate, enddate }, { new: true })
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, { content, startdate, enddate }, { new: true })
       .populate('user', { username: 1 })
 
     res.json(Event.format(updatedEvent))
