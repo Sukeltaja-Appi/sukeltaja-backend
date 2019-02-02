@@ -4,7 +4,7 @@ const api = supertest(app)
 const initializeDb = require('./_test_helper')
 
 beforeAll(async () => {
-  await initializeDb
+  await initializeDb()
 })
 
 describe('event tests', async () => {
