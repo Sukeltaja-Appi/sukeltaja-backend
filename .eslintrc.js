@@ -52,5 +52,8 @@ module.exports = {
       "error",
       "before"
     ],
+    "max-len": [
+      "error", { "code": 120 }
+    ],
   }
 }

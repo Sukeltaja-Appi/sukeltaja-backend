@@ -16,7 +16,7 @@ describe('event tests', async () => {
       .expect('Content-Type', /application\/json/)
   })
 
-  test('the first event content is "Suomen vanhin hylky, huono sää"', async () => {
+  test('the first event content is correct', async () => {
     const response = await api
       .get('/events')
 
