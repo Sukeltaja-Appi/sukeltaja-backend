@@ -13,6 +13,7 @@ eventRouter.get('/', async (req, res) => {
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
 
+// Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
@@ -29,6 +30,7 @@ eventRouter.get('/:id', async (req, res) => {
   }
 })
 
+// Authorized user can post an event.
 eventRouter.post('/', async (req, res) => {
   try {
     const { content } = req.body
@@ -41,6 +43,7 @@ eventRouter.post('/', async (req, res) => {
     const event = new Event({
       content: content,
       startdate: new Date(),
+      enddate: new Date(),
       user: user.id
     })
 
@@ -56,6 +59,7 @@ eventRouter.post('/', async (req, res) => {
   }
 })
 
+// Authorized user can edit own event.
 eventRouter.put('/:id', async (req, res) => {
   try {
     const { content, startdate, enddate } = req.body
@@ -86,6 +90,17 @@ eventRouter.put('/:id', async (req, res) => {
       console.log(exception)
       res.status(500).json({ error: 'something went wrong...' })
     }
+  }
+})
+
+// Authorized user can delete own event.
+eventRouter.delete('/:id', async (req, res) => {
+  try {
+    await Event.findByIdAndRemove(req.params.id)
+
+    res.status(204).end()
+  } catch (exception) {
+    res.status(400).send({ error: 'malformatted id' })
   }
 })
 
