@@ -93,6 +93,23 @@ describe('event tests', async () => {
     expect(response.body.content).toBe('Modified content')
   })
 
+  test('event can be deleted', async () => {
+    const allEvents = await api
+      .get('/events')
+
+    const event = allEvents.body[1]
+
+    await api
+      .delete(`/events/${event.id}`)
+      .set('Authorization', `bearer ${await login()}`)
+      .expect(204)
+
+    const restEvents = await api
+      .get('/events')
+
+    expect(restEvents.body.length).toBe(1)
+  })
+
   test('the user of the event can be seen', async () => {
     const response = await api
       .get('/events')
