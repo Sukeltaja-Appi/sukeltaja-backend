@@ -1,5 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const bodyParser = require('body-parser')
 const http = require('http')
@@ -22,6 +23,7 @@ mongoose
     console.log(err)
   })
 
+app.use(cors())
 app.use(bodyParser.json())
 
 app.use(express.static('build'))

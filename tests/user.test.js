@@ -1,7 +1,7 @@
 const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
-const initializeDb = require('./_test_helper')
+const { initializeDb } = require('./_test_helper')
 
 beforeAll(async () => {
   await initializeDb()

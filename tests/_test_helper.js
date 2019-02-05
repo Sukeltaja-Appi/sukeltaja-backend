@@ -11,7 +11,12 @@ const userObject = {
 }
 
 const eventObjects = [
-  { 'content': 'Suomen vanhin hylky, huono sää.' },
+  {
+    'content': 'Suomen vanhin hylky, huono sää.',
+    'startdate': '2019-01-15T13:03:22.014Z',
+    '__v': 0,
+    'enddate': '2019-01-15T14:12:25.128Z'
+  }
 ]
 
 // Functions to initialize DB
@@ -56,4 +61,4 @@ const initializeDb = async () => {
   await postEvents(token)
 }
 
-module.exports = initializeDb
+module.exports = { initializeDb, login }
