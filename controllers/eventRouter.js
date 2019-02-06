@@ -1,6 +1,7 @@
 const eventRouter = require('express').Router()
 const Event = require('../models/event')
 const requireAuthentication = require('../middleware/authenticate')
+const handleEndDate = require('../middleware/dates')
 
 eventRouter.get('/', async (req, res) => {
   const events = await Event
@@ -33,7 +34,7 @@ eventRouter.get('/:id', async (req, res) => {
 // Authorized user can post an event.
 eventRouter.post('/', async (req, res) => {
   try {
-    const { content } = req.body
+    const { content, startdate, enddate } = req.body
     const { user } = res.locals
 
     if (!content) {
@@ -41,9 +42,9 @@ eventRouter.post('/', async (req, res) => {
     }
 
     const event = new Event({
-      content: content,
-      startdate: new Date(),
-      enddate: new Date(),
+      content,
+      startdate: startdate || new Date(),
+      enddate: handleEndDate(startdate || new Date(), enddate),
       user: user.id
     })
 
