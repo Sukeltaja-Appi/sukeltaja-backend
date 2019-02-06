@@ -13,10 +13,9 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(uniqueValidator)
 
 userSchema.statics.format = (user) => {
-  return{
+  return {
     id: user._id,
     username: user.username,
-    password: user.password, //poistetaan tuotannnossa
     events: user.events
   }
 }
