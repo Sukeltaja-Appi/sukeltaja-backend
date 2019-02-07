@@ -9,9 +9,13 @@ eventRouter.get('/', async (req, res) => {
       .find({})
       .populate('user', { username: 1 })
       .populate('dives')
+      .populate('target')
 
     res.json(events.map(Event.format))
   } catch (exception) {
+
+    console.log(exception)
+
     return res.status(500).json({ error: 'something went wrong...' })
   }
 
@@ -44,7 +48,7 @@ eventRouter.post('/', async (req, res) => {
     const { user } = res.locals
 
     if (!description) {
-      return res.status(400).json({ error: 'content missing' })
+      return res.status(400).json({ error: 'description missing' })
     }
 
     const event = new Event({
@@ -75,7 +79,7 @@ eventRouter.put('/:id', async (req, res) => {
   try {
     const { description, startdate, enddate, dives, target } = req.body
 
-    if (!description || !startdate || !enddate || !dives || !target) {
+    if (!description) {
       return res.status(400).json({ error: 'missing fields' })
     }
 
@@ -91,8 +95,8 @@ eventRouter.put('/:id', async (req, res) => {
       { description, startdate, enddate, dives, target },
       { new: true }
     ).populate('user', { username: 1 })
+      .populate('dives')
       .populate('target')
-      .populate('dive')
 
     res.json(Event.format(updatedEvent))
 
@@ -109,6 +113,12 @@ eventRouter.put('/:id', async (req, res) => {
 // Authorized user can delete own event.
 eventRouter.delete('/:id', async (req, res) => {
   try {
+    const event = await Event.findById(req.params.id)
+
+    if (event.dives.length > 0){
+      res.status(401).json({ error: 'delete dives first' })
+    }
+
     await Event.findByIdAndRemove(req.params.id)
 
     res.status(204).end()

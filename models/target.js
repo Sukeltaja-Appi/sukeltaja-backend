@@ -4,11 +4,11 @@ const targetSchema = new mongoose.Schema({
   name: String,
   type: String,
   depth: Number,
-  longitude: {
+  latitude: {
     type: Number,
     required: true
   },
-  latitude: {
+  longitude: {
     type: Number,
     required: true
   }
@@ -17,10 +17,11 @@ const targetSchema = new mongoose.Schema({
 targetSchema.statics.format = (target) => {
   return {
     id: target._id,
+    name: target.name,
     type: target.type,
     depth: target.depth,
-    longitude: target.longitude,
-    latitude: target.latitude
+    latitude: target.latitude,
+    longitude: target.longitude
   }
 }
 const Target = mongoose.model('Target', targetSchema)

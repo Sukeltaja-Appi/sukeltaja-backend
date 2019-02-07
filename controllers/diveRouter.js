@@ -12,7 +12,7 @@ diveRouter.get('/', async (req, res) => {
     res.json(dives.map(Dive.format))
   } catch (exception) {
     console.log(exception)
-    
+
     return res.status(500).json({ error: 'something went wrong...' })
   }
 
@@ -22,7 +22,7 @@ diveRouter.all('*', requireAuthentication)
 
 diveRouter.post('/', async (req, res) => {
   try {
-    const { startdate, enddate, event, longitude, latitude } = req.body
+    const { startdate, enddate, event, latitude, longitude } = req.body
     const { user } = res.locals
 
     if (!event || !longitude || !latitude) {
@@ -34,8 +34,8 @@ diveRouter.post('/', async (req, res) => {
       enddate: handleEndDate(startdate || new Date(), enddate),
       event: event.id,
       user: user.id,
-      longitude,
-      latitude
+      latitude,
+      longitude
     })
 
     const savedDive = await dive.save()
@@ -54,6 +54,17 @@ diveRouter.post('/', async (req, res) => {
     console.log(exception)
 
     return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+diveRouter.delete('/:id', async (req, res) => {
+  try {
+
+    await Dive.findByIdAndRemove(req.params.id)
+
+    res.status(204).end()
+  } catch (exception) {
+    res.status(400).send({ error: 'malformatted id' })
   }
 })
 

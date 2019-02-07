@@ -20,7 +20,7 @@ describe('event tests', async () => {
     const response = await api
       .get('/events')
 
-    expect(response.body[0].content).toBe('Suomen vanhin hylky, huono sää.')
+    expect(response.body[0].description).toBe('Suomen vanhin hylky, huono sää.')
   })
 
   test('the id of the user of the event can be seen', async () => {
@@ -36,9 +36,11 @@ describe('event tests', async () => {
   test('event can be posted', async () => {
     const newEvent = {
 
-      'content': 'Haikaloja liikkeellä',
+      'description': 'Haikaloja liikkeellä',
       'startdate': '2019-02-15T13:03:22.014Z',
-      'enddate': '2019-02-15T14:12:25.128Z'
+      'enddate': '2019-02-15T14:12:25.128Z',
+      'target': null,
+      'dives': [],
 
     }
 
@@ -52,7 +54,7 @@ describe('event tests', async () => {
     const response = await api
       .get('/events')
 
-    const contents = response.body.map(r => r.content)
+    const contents = response.body.map(r => r.description)
 
     expect(contents).toContain('Haikaloja liikkeellä')
   })
@@ -63,7 +65,7 @@ describe('event tests', async () => {
 
     const eventModify = events.body[1]
 
-    eventModify.content = 'Modified content'
+    eventModify.description = 'Modified content'
 
     await api
       .put(`/events/${eventModify.id}`)
@@ -75,7 +77,7 @@ describe('event tests', async () => {
     const response = await api
       .get('/events')
 
-    const contents = response.body.map(r => r.content)
+    const contents = response.body.map(r => r.description)
 
     expect(contents).toContain('Modified content')
   })
@@ -90,7 +92,7 @@ describe('event tests', async () => {
       .get(`/events/${event.id}`)
       .set('Authorization', `bearer ${await login()}`)
 
-    expect(response.body.content).toBe('Modified content')
+    expect(response.body.description).toBe('Modified content')
   })
 
   test('event can be deleted', async () => {

@@ -5,7 +5,7 @@ const eventSchema = new mongoose.Schema({
   startdate: Date,
   enddate: Date,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  target: String,
+  target: { type: mongoose.Schema.Types.ObjectId, ref: 'Target' },
   dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }]
 
 })

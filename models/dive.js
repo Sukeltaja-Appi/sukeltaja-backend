@@ -5,8 +5,8 @@ const diveSchema = new mongoose.Schema({
   enddate: Date,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
-  longitude: Number,
-  latitude: Number
+  latitude: Number,
+  longitude: Number
 })
 
 diveSchema.statics.format = (dive) => {
@@ -16,8 +16,8 @@ diveSchema.statics.format = (dive) => {
     enddate: dive.enddate,
     user: dive.user,
     event: dive.event,
-    longitude: dive.longitude,
-    latitude: dive.latitude
+    latitude: dive.latitude,
+    longitude: dive.longitude
   }
 }
 const Dive = mongoose.model('Dive', diveSchema)
