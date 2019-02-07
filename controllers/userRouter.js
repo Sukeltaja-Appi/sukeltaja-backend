@@ -5,16 +5,23 @@ const bcrypt = require('bcrypt')
 // Returns all current events from database as JSON
 
 userRouter.get('/', async (req, res) => {
-  const users = await User
-    .find({})
-    .populate('events', { content: 1, startdate: 1, enddate: 1 })
+  try{
+    const users = await User
+      .find({})
+      .populate('events', { description: 1, startdate: 1, enddate: 1 })
+      .populate('dives')
 
-  res.json(users.map(User.format))
+    res.json(users.map(User.format))
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
 })
 
 userRouter.get('/:id', async (req, res) => {
   const user = await User.findById(req.params.id)
-    .populate('events', { content: 1, startdate: 1, enddate: 1 })
+    .populate('events', { description: 1, startdate: 1, enddate: 1 })
 
   res.json(User.format(user))
 })
@@ -33,7 +40,8 @@ userRouter.post('/', async (req, res) => {
     const user = new User({
       username: body.username,
       password: passwordHash,
-      events: body.events
+      events: body.events,
+      dives: body.dives
     })
 
     const savedUser = await user.save()
