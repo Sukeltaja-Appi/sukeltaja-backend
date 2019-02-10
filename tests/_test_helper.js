@@ -1,8 +1,12 @@
+//import { eventNames } from 'cluster';
+
 const supertest = require('supertest')
 const { app } = require('../index')
 const api = supertest(app)
 const User = require('../models/user')
 const Event = require('../models/event')
+const Dive = require('../models/dive')
+const Target = require('../models/target')
 
 // Initial objects in DB
 const userObject = {
@@ -12,10 +16,22 @@ const userObject = {
 
 const eventObjects = [
   {
-    'content': 'Suomen vanhin hylky, huono sää.',
+    'description': 'Suomen vanhin hylky, huono sää.',
     'startdate': '2019-01-15T13:03:22.014Z',
     '__v': 0,
-    'enddate': '2019-01-15T14:12:25.128Z'
+    'enddate': '2019-01-15T14:12:25.128Z',
+    'target': null,
+    'dives': []
+  }
+]
+
+const targetObjects = [
+  {
+    'name': 'Ruotohylky',
+    'type': 'Hylky',
+    'depth': '17',
+    'latitude': '59.95756592',
+    'longitude': '24.37135085'
   }
 ]
 
@@ -42,10 +58,43 @@ const login = async () => {
 }
 
 const postEvents = async (token) => {
+  let event
+
   await api
     .post('/events')
     .set('Authorization', `bearer ${token}`)
     .send(eventObjects[0])
+    .expect(200)
+    .then(res => {
+      event = res.body
+    })
+
+  return event
+}
+
+const postTargets = async (token) => {
+  await api
+    .post('/target')
+    .set('Authorization', `bearer ${token}`)
+    .send(targetObjects[0])
+    .expect(200)
+}
+
+const postDive = async (event, token) => {
+  const diveObject = {
+
+    'startdate': '2019-01-15T13:03:22.014Z',
+    'enddate': '2019-01-15T14:12:25.128Z',
+    'event': `${event.id}`,
+    'longitude': '60.5525',
+    'latitude': '24.1232',
+    '__v': 0
+  }
+
+  await api
+    .post('/dives')
+    .set('Authorization', `bearer ${token}`)
+    .send(diveObject)
     .expect(200)
 }
 
@@ -53,12 +102,19 @@ const postEvents = async (token) => {
 const initializeDb = async () => {
   await User.deleteMany({})
   await Event.deleteMany({})
+  await Target.deleteMany({})
+  await Dive.deleteMany({})
 
   await postUser()
 
   const token = await login()
 
-  await postEvents(token)
+  const event = await postEvents(token)
+
+  await postTargets(token)
+
+  await postDive(event, token)
+
 }
 
 module.exports = { initializeDb, login }

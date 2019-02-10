@@ -9,6 +9,8 @@ const middleware = require('./utils/middleware')
 const eventRouter = require('./controllers/eventRouter')
 const userRouter = require('./controllers/userRouter')
 const loginRouter = require('./controllers/loginRouter')
+const targetRouter = require('./controllers/targetRouter')
+const diveRouter = require('./controllers/diveRouter')
 
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
@@ -35,6 +37,8 @@ app.get('/', (req, res) => {
 app.use('/events', eventRouter)
 app.use('/users', userRouter)
 app.use('/login', loginRouter)
+app.use('/target', targetRouter)
+app.use('/dives', diveRouter)
 
 const server = http.createServer(app)
 

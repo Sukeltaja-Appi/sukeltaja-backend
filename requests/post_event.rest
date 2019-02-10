@@ -1,12 +1,14 @@
 POST http://localhost:3001/events
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0ODc3MjIyOX0.2R_jraszM7emF0y6YmfXa3ZTrPE0Phdw795VdN0wCvw
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTU1OTU2Mn0.7fq-1iBge_wR84NHTBatDCyBAaSTlAyXNLhbZMygLdA
 
 {
     "_id": "",
-    "content": "Hai vei kädetkin",
+    "description": "Taas mennään.",
     "startdate": "",
     "enddate": "",
     "user": "5c50563f2da79c31a0a4e7fe",
+    "target": "1",
+    "dives": [],
     "__v": 0
 }

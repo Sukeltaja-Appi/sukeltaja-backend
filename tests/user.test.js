@@ -26,7 +26,14 @@ describe('user tests', async () => {
     const response = await api
       .get('/users')
 
-    expect(response.body[0].events[0].content).toBe('Suomen vanhin hylky, huono sää.')
+    expect(response.body[0].events[0].description).toBe('Suomen vanhin hylky, huono sää.')
+  })
+
+  test('content of the dives of the user can be seen', async () => {
+    const response = await api
+      .get('/users')
+
+    expect(response.body[0].dives[0].longitude).toBe(60.5525)
   })
 })
 
