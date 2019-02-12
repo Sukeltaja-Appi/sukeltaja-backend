@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const eventSchema = new mongoose.Schema({
+  title: String,
   description: String,
   startdate: Date,
   enddate: Date,
@@ -13,6 +14,7 @@ const eventSchema = new mongoose.Schema({
 eventSchema.statics.format = (event) => {
   return {
     id: event._id,
+    title: event.title,
     description: event.description,
     startdate: event.startdate,
     enddate: event.enddate,
