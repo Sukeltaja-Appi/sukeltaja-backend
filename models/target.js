@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 
 const targetSchema = new mongoose.Schema({
   name: String,
-  type: String,
-  depth: Number,
+  depth: String,
   latitude: {
     type: Number,
     required: true
@@ -22,7 +21,6 @@ targetSchema.statics.format = (target) => {
   return {
     id: target._id,
     name: target.name,
-    type: target.type,
     depth: target.depth,
     latitude: target.latitude,
     longitude: target.longitude,

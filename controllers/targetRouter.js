@@ -22,7 +22,7 @@ targetRouter.all('*', requireAuthentication)
 
 targetRouter.post('/', async (req, res) => {
   try {
-    const { name, type, depth, latitude, longitude, hylyt_id, hylyt_link, mj_id } = req.body
+    const { name, depth, latitude, longitude, hylyt_id, hylyt_link, mj_id } = req.body
 
     if (!longitude || !latitude) {
       return res.status(400).json({ error: 'coordinates missing' })
@@ -30,7 +30,6 @@ targetRouter.post('/', async (req, res) => {
 
     const target = new Target({
       name,
-      type,
       depth,
       latitude,
       longitude,
