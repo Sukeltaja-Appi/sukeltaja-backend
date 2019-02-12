@@ -8,6 +8,8 @@ diveRouter.get('/', async (req, res) => {
   try {
     const dives = await Dive
       .find({})
+      .populate('user', { username: 1 })
+      .populate('event', { title: 1, description: 1 })
 
     res.json(dives.map(Dive.format))
   } catch (exception) {
@@ -68,4 +70,37 @@ diveRouter.delete('/:id', async (req, res) => {
   }
 })
 
+diveRouter.put('/:id', async (req, res) => {
+  try {
+    const { startdate, enddate, event, latitude, longitude } = req.body
+
+    if (!startdate && !enddate && !event && !latitude && !longitude) {
+      return res.status(400).json({ error: 'missing fields' })
+    }
+
+    const dive = await Dive.findById(req.params.id)
+      .populate('user', { username: 1 })
+
+    if (dive.user.id !== res.locals.user.id) {
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
+
+    const updatedDive = await Dive.findByIdAndUpdate(
+      req.params.id,
+      { startdate, enddate, event, latitude, longitude },
+      { new: true }
+    ).populate('user', { username: 1 })
+      .populate('event')
+
+    res.json(Dive.format(updatedDive))
+
+  } catch (exception) {
+    if (exception.name === 'JsonWebTokenError') {
+      res.status(401).json({ error: exception.message })
+    } else {
+      console.log(exception)
+      res.status(500).json({ error: 'something went wrong...' })
+    }
+  }
+})
 module.exports = diveRouter

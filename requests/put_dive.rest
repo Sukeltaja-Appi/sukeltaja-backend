@@ -1,0 +1,14 @@
+PUT http://localhost:3001/dives/5c5c331c38a6e532e08fce11
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTk2ODYwMH0.c6DRDsClHDPq2zh4TNFZFuMuUazhkDph7jNGvf68WVI
+
+{
+    "_id": "",
+    "startdate": "2019-02-07T16:31:08.333Z",
+    "enddate": "2019-02-07T18:22:08.333Z",
+    "user": "5c50563f2da79c31a0a4e7fe",
+    "event": "5c5fccb60c88de71c1223926",
+    "longitude": 60.5525,
+    "latitude": 24.1232,
+    "__v": 0
+}

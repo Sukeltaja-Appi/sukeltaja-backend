@@ -8,7 +8,7 @@ eventRouter.get('/', async (req, res) => {
     const events = await Event
       .find({})
       .populate('user', { username: 1 })
-      .populate('dives')
+      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
     res.json(events.map(Event.format))
@@ -44,7 +44,7 @@ eventRouter.get('/:id', async (req, res) => {
 // Authorized user can post an event.
 eventRouter.post('/', async (req, res) => {
   try {
-    const { description, startdate, enddate, dives, target } = req.body
+    const { title, description, startdate, enddate, dives, target } = req.body
     const { user } = res.locals
 
     if (!description) {
@@ -52,6 +52,7 @@ eventRouter.post('/', async (req, res) => {
     }
 
     const event = new Event({
+      title,
       description,
       startdate: startdate || new Date(),
       enddate: handleEndDate(startdate || new Date(), enddate),
@@ -77,7 +78,7 @@ eventRouter.post('/', async (req, res) => {
 // Authorized user can edit own event.
 eventRouter.put('/:id', async (req, res) => {
   try {
-    const { description, startdate, enddate, dives, target } = req.body
+    const { title, description, startdate, enddate, dives, target } = req.body
 
     if (!description) {
       return res.status(400).json({ error: 'missing fields' })
@@ -92,7 +93,7 @@ eventRouter.put('/:id', async (req, res) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
-      { description, startdate, enddate, dives, target },
+      { title, description, startdate, enddate, dives, target },
       { new: true }
     ).populate('user', { username: 1 })
       .populate('dives')
@@ -115,7 +116,7 @@ eventRouter.delete('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
 
-    if (event.dives.length > 0){
+    if (event.dives.length > 0) {
       res.status(401).json({ error: 'delete dives first' })
     }
 
