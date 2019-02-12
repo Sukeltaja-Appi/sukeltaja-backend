@@ -1,12 +1,15 @@
 POST http://localhost:3001/target
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTU1OTU2Mn0.7fq-1iBge_wR84NHTBatDCyBAaSTlAyXNLhbZMygLdA
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTk4NTYzMn0.DvNiRZTBktQJsxxK3R6_bwibYGQLRQ-P21P28EAA0hk
 
 {
     "_id": "",
-    "name": "Ruotohylky",
+    "name": "Koiraluotojen soutuvene",
     "type": "Hylky",
-    "depth": 17,
-    "latitude": 59.95756592,
-    "longitude": 24.37135085
+    "depth": 7,
+    "latitude": 60.1604,
+    "longitude": 25.017483333,
+    "hylyt_id": 7993,
+    "hylyt_link": "http://www.hylyt.net/item/koiraluotojen-soutuvene/",
+    "mj_id": "1000028676"
 }

@@ -4,7 +4,8 @@ const requireAuthentication = require('../middleware/authenticate')
 const Event = require('../models/event')
 const handleEndDate = require('../middleware/dates')
 
-diveRouter.get('/', async (req, res) => {
+// This will be removed later
+diveRouter.get('/unauth', async (req, res) => {
   try {
     const dives = await Dive
       .find({})
@@ -21,6 +22,22 @@ diveRouter.get('/', async (req, res) => {
 })
 
 diveRouter.all('*', requireAuthentication)
+
+diveRouter.get('/', async (req, res) => {
+  try {
+    const dives = await Dive
+      .find({})
+      .populate('user', { username: 1 })
+      .populate('event', { title: 1, description: 1 })
+
+    res.json(dives.map(Dive.format))
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+
+})
 
 diveRouter.post('/', async (req, res) => {
   try {
@@ -90,7 +107,7 @@ diveRouter.put('/:id', async (req, res) => {
       { startdate, enddate, event, latitude, longitude },
       { new: true }
     ).populate('user', { username: 1 })
-      .populate('event')
+      .populate('event', { title: 1, description: 1 })
 
     res.json(Dive.format(updatedDive))
 

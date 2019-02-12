@@ -3,8 +3,9 @@ const Event = require('../models/event')
 const requireAuthentication = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
 
-eventRouter.get('/', async (req, res) => {
+eventRouter.get('/unauth', async (req, res) => {
   try {
+
     const events = await Event
       .find({})
       .populate('user', { username: 1 })
@@ -23,6 +24,25 @@ eventRouter.get('/', async (req, res) => {
 
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
+
+eventRouter.get('/', async (req, res) => {
+  try {
+
+    const events = await Event
+      .find({})
+      .populate('user', { username: 1 })
+      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
+      .populate('target')
+
+    res.json(events.map(Event.format))
+  } catch (exception) {
+
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+
+})
 
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
