@@ -1,4 +1,4 @@
-POST http://localhost:3001/target
+POST http://localhost:3001/targets
 Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTk4NTYzMn0.DvNiRZTBktQJsxxK3R6_bwibYGQLRQ-P21P28EAA0hk
 

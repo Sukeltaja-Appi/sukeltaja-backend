@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
 app.use('/events', eventRouter)
 app.use('/users', userRouter)
 app.use('/login', loginRouter)
-app.use('/target', targetRouter)
+app.use('/targets', targetRouter)
 app.use('/dives', diveRouter)
 
 const server = http.createServer(app)
