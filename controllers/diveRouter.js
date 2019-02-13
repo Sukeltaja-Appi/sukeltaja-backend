@@ -4,6 +4,26 @@ const requireAuthentication = require('../middleware/authenticate')
 const Event = require('../models/event')
 const handleEndDate = require('../middleware/dates')
 
+// This will be removed later
+diveRouter.get('/unauth', async (req, res) => {
+  try {
+    const dives = await Dive
+      .find({})
+      .populate('user', { username: 1 })
+      .populate('event', { title: 1, description: 1 })
+
+    res.json(dives.map(Dive.format))
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+
+})
+
+// From here on require authentication on all routes.
+diveRouter.all('*', requireAuthentication)
+
 diveRouter.get('/', async (req, res) => {
   try {
     const dives = await Dive
@@ -20,15 +40,13 @@ diveRouter.get('/', async (req, res) => {
 
 })
 
-diveRouter.all('*', requireAuthentication)
-
 diveRouter.post('/', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
     const { user } = res.locals
 
-    if (!event || !longitude || !latitude) {
-      return res.status(400).json({ error: 'content missing' })
+    if (!event || !longitude || !latitude || !startdate) {
+      return res.status(400).json({ error: 'missing fields' })
     }
 
     const dive = new Dive({
@@ -74,7 +92,7 @@ diveRouter.put('/:id', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
 
-    if (!startdate && !enddate && !event && !latitude && !longitude) {
+    if (!startdate || !enddate || !event || !latitude || !longitude) {
       return res.status(400).json({ error: 'missing fields' })
     }
 
@@ -90,7 +108,7 @@ diveRouter.put('/:id', async (req, res) => {
       { startdate, enddate, event, latitude, longitude },
       { new: true }
     ).populate('user', { username: 1 })
-      .populate('event')
+      .populate('event', { title: 1, description: 1 })
 
     res.json(Dive.format(updatedDive))
 

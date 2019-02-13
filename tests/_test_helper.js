@@ -1,5 +1,3 @@
-//import { eventNames } from 'cluster';
-
 const supertest = require('supertest')
 const { app } = require('../index')
 const api = supertest(app)
@@ -74,7 +72,7 @@ const postEvents = async (token) => {
 
 const postTargets = async (token) => {
   await api
-    .post('/target')
+    .post('/targets')
     .set('Authorization', `bearer ${token}`)
     .send(targetObjects[0])
     .expect(200)
