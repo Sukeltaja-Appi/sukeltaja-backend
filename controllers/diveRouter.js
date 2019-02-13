@@ -21,6 +21,7 @@ diveRouter.get('/unauth', async (req, res) => {
 
 })
 
+// From here on require authentication on all routes.
 diveRouter.all('*', requireAuthentication)
 
 diveRouter.get('/', async (req, res) => {
@@ -44,8 +45,8 @@ diveRouter.post('/', async (req, res) => {
     const { startdate, enddate, event, latitude, longitude } = req.body
     const { user } = res.locals
 
-    if (!event || !longitude || !latitude) {
-      return res.status(400).json({ error: 'content missing' })
+    if (!event || !longitude || !latitude || !startdate) {
+      return res.status(400).json({ error: 'missing fields' })
     }
 
     const dive = new Dive({
@@ -91,7 +92,7 @@ diveRouter.put('/:id', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
 
-    if (!startdate && !enddate && !event && !latitude && !longitude) {
+    if (!startdate || !enddate || !event || !latitude || !longitude) {
       return res.status(400).json({ error: 'missing fields' })
     }
 
