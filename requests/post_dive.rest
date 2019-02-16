@@ -1,13 +1,13 @@
-POST http://localhost:3001/dives
+POST http://sukeltaja.herokuapp.com/dives
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTU0NDYxMn0.xmsPHasf9TlXEIGswAmsCcHs4JEoZdxqsX8a8ZDDR34
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU0OTk2ODk2MX0.5G8KeBfcEmQzh8pVmKZjdER6V6b-GoROv1PKI_yLTuc
 
 {
     "_id": "",
     "startdate": "2019-02-07T16:31:08.333Z",
     "enddate": "2019-02-07T18:22:08.333Z",
     "user": "5c50563f2da79c31a0a4e7fe",
-    "event": "5c5c2fbc4d811f47c08e34a7",
+    "event": "5c543ed527e5fa0004672878",
     "longitude": 60.5525,
     "latitude": 24.1232,
     "__v": 0

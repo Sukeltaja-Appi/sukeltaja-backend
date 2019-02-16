@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 let port = process.env.PORT
 let mongoUrl = process.env.MONGODB_URI
+let kyppiUrl = process.env.KYPPI_URL
 
 let apiUrl = process.env.API_URL
 
@@ -13,7 +14,11 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 module.exports = {
+<<<<<<< HEAD
   apiUrl,
+=======
+  kyppiUrl,
+>>>>>>> master
   mongoUrl,
   port
 }

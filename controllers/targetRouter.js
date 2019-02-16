@@ -1,6 +1,9 @@
 const targetRouter = require('express').Router()
 const Target = require('../models/target')
 const requireAuthentication = require('../middleware/authenticate')
+const config = require('../utils/config')
+
+const linkToKyppi = (mj_id) => mj_id ? `${config.kyppiUrl}${mj_id}` : undefined
 
 targetRouter.get('/', async (req, res) => {
   try {
@@ -15,11 +18,12 @@ targetRouter.get('/', async (req, res) => {
   }
 })
 
+// From here on require authentication on all routes.
 targetRouter.all('*', requireAuthentication)
 
 targetRouter.post('/', async (req, res) => {
   try {
-    const { name, type, depth, latitude, longitude } = req.body
+    const { name, depth, latitude, longitude, hylyt_id, hylyt_link, mj_id } = req.body
 
     if (!longitude || !latitude) {
       return res.status(400).json({ error: 'coordinates missing' })
@@ -27,10 +31,13 @@ targetRouter.post('/', async (req, res) => {
 
     const target = new Target({
       name,
-      type,
       depth,
       latitude,
-      longitude
+      longitude,
+      hylyt_id,
+      hylyt_link,
+      mj_id,
+      mj_link: linkToKyppi(mj_id)
     })
 
     const savedTarget = await target.save()
