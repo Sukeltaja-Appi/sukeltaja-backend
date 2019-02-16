@@ -31,19 +31,23 @@ app.use(bodyParser.json())
 app.use(express.static('build'))
 app.use(middleware.logger)
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hello backend!</h1> <a href="/events">Events</a>')
+app.get('/api', (req, res) => {
+  res.send('<h1>Backend API starts here</h1> ')
 })
-app.use('/events', eventRouter)
-app.use('/users', userRouter)
-app.use('/login', loginRouter)
-app.use('/target', targetRouter)
-app.use('/dives', diveRouter)
+app.get('/', (req, res) => {
+  res.send('<h1>Backoffice will be here</h1> ')
+})
+app.use(`${config.apiUrl}/events`, eventRouter)
+app.use(`${config.apiUrl}/users`, userRouter)
+app.use(`${config.apiUrl}/login`, loginRouter)
+app.use(`${config.apiUrl}/targets`, targetRouter)
+app.use(`${config.apiUrl}/dives`, diveRouter)
 
 const server = http.createServer(app)
 
 server.listen(config.port, () => {
   console.log(`Server running on port ${config.port}`)
+  console.log(`API root starts at ${config.apiUrl}`)
 })
 
 server.on('close', () => {
