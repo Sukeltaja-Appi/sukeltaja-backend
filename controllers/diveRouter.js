@@ -52,7 +52,7 @@ diveRouter.post('/', async (req, res) => {
     const dive = new Dive({
       startdate: startdate || new Date(),
       enddate: handleEndDate(startdate || new Date(), enddate),
-      event: event.id,
+      event: event,
       user: user.id,
       latitude,
       longitude
@@ -67,7 +67,7 @@ diveRouter.post('/', async (req, res) => {
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
-
+    console.log(savedDive)
     res.json(Dive.format(savedDive))
 
   } catch (exception) {
