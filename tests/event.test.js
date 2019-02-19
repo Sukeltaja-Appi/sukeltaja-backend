@@ -2,6 +2,7 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 const { initializeDb, login } = require('./_test_helper')
+const config = require('../utils/config')
 
 let token
 
@@ -15,7 +16,7 @@ describe('event tests', async () => {
 
   test('events are returned as json', async () => {
     await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -23,7 +24,7 @@ describe('event tests', async () => {
 
   test('the first event content is correct', async () => {
     const response = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     expect(response.body[0].description).toBe('Suomen vanhin hylky, huono sää.')
@@ -31,11 +32,11 @@ describe('event tests', async () => {
 
   test('the id of the user of the event can be seen', async () => {
     const user = await api
-      .get('/users')
+      .get(`${config.apiUrl}/users`)
       .set('Authorization', `bearer ${token}`)
 
     const response = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     expect(response.body[0].user._id).toBe(user.body[0].id)
@@ -53,14 +54,14 @@ describe('event tests', async () => {
     }
 
     await api
-      .post('/events')
+      .post(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
       .send(newEvent)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
     const response = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     const contents = response.body.map(r => r.description)
@@ -70,7 +71,7 @@ describe('event tests', async () => {
 
   test('event can be modified', async () => {
     const events = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     const eventModify = events.body[1]
@@ -78,14 +79,14 @@ describe('event tests', async () => {
     eventModify.description = 'Modified content'
 
     await api
-      .put(`/events/${eventModify.id}`)
+      .put(`${config.apiUrl}/events/${eventModify.id}`)
       .set('Authorization', `bearer ${token}`)
       .send(eventModify)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
     const response = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     const contents = response.body.map(r => r.description)
@@ -95,13 +96,13 @@ describe('event tests', async () => {
 
   test('single event can be seen', async () => {
     const allEvents = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     const event = allEvents.body[1]
 
     const response = await api
-      .get(`/events/${event.id}`)
+      .get(`${config.apiUrl}/events/${event.id}`)
       .set('Authorization', `bearer ${token}`)
 
     expect(response.body.description).toBe('Modified content')
@@ -109,18 +110,18 @@ describe('event tests', async () => {
 
   test('event can be deleted', async () => {
     const allEvents = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     const event = allEvents.body[1]
 
     await api
-      .delete(`/events/${event.id}`)
+      .delete(`${config.apiUrl}/events/${event.id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(204)
 
     const restEvents = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     expect(restEvents.body.length).toBe(1)
@@ -128,7 +129,7 @@ describe('event tests', async () => {
 
   test('the user of the event can be seen', async () => {
     const response = await api
-      .get('/events')
+      .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
     expect(response.body[0].user.username).toBe('SamiSukeltaja')

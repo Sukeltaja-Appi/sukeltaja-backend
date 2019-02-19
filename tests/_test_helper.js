@@ -5,6 +5,7 @@ const User = require('../models/user')
 const Event = require('../models/event')
 const Dive = require('../models/dive')
 const Target = require('../models/target')
+const config = require('../utils/config')
 
 // Initial objects in DB
 const userObject = {
@@ -36,7 +37,7 @@ const targetObjects = [
 // Functions to initialize DB
 const postUser = async () => {
   await api
-    .post('/users')
+    .post(`${config.apiUrl}/users`)
     .send(userObject)
     .expect(200)
 }
@@ -45,7 +46,7 @@ const login = async () => {
   let token
 
   await api
-    .post('/login')
+    .post(`${config.apiUrl}/login`)
     .send(userObject)
     .expect(200)
     .then(res => {
@@ -59,7 +60,7 @@ const postEvents = async (token) => {
   let event
 
   await api
-    .post('/events')
+    .post(`${config.apiUrl}/events`)
     .set('Authorization', `bearer ${token}`)
     .send(eventObjects[0])
     .expect(200)
@@ -72,7 +73,7 @@ const postEvents = async (token) => {
 
 const postTargets = async (token) => {
   await api
-    .post('/targets')
+    .post(`${config.apiUrl}/targets`)
     .set('Authorization', `bearer ${token}`)
     .send(targetObjects[0])
     .expect(200)
@@ -90,7 +91,7 @@ const postDive = async (event, token) => {
   }
 
   await api
-    .post('/dives')
+    .post(`${config.apiUrl}/dives`)
     .set('Authorization', `bearer ${token}`)
     .send(diveObject)
     .expect(200)
