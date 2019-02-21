@@ -30,10 +30,12 @@ eventRouter.get('/', async (req, res) => {
 
     const events = await Event
       .find({})
+      .where('user').equals(res.locals.user.id)
       .populate('user', { username: 1 })
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
+    //events = events.filter(event => event.user.id === res.locals.user.id)
     res.json(events.map(Event.format))
   } catch (exception) {
 
