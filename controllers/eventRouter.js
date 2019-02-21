@@ -29,19 +29,27 @@ eventRouter.get('/unauth', async (req, res) => {
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
 
+// .where('creator').equals(res.locals.user.id)
+// .where('admins').contains(res.locals.user.id)
+// .where('participants').contains(res.locals.user.id)
+
 eventRouter.get('/', async (req, res) => {
   try {
 
     let events = await Event
-      .find({})
-      .where('user').equals(res.locals.user.id)
+      .find({
+        $or: [
+          { 'creator': res.locals.user.id },
+          { 'admins': { $in: [res.locals.user.id] } },
+          { 'participants': { $in: [res.locals.user.id] } }
+        ]
+      })
       .populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
-    //events = events.filter(event => event.user.id === res.locals.user.id)
     res.json(events.map(Event.format))
   } catch (exception) {
 
