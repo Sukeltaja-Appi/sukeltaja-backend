@@ -105,11 +105,47 @@ eventRouter.post('/', async (req, res) => {
     return res.status(500).json({ error: 'something went wrong...' })
   }
 })
-/*
-eventRouter.post('/:id/admin', async (req, res) => {
+
+eventRouter.put('/:id/add', async (req, res) => {
   try {
-    const { users } = req.body
-    const event = Event.findById(req.params.id)
+    const event = await Event.findById(req.params.id)
+    const { user } = res.locals
+    var admins = event.admins
+    var pending = event.pending
+    var participants = event.participants
+    /*
+    if (!event.pending.includes(res.locals.user.id)) {
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
+    */
+    var userObject
+    var i
+    for (i = 0; i < pending.length; i++) {
+      if (pending[i].user == user.id) {
+        userObject = pending[i]
+        pending.splice(i, 1)
+      }
+    }
+
+    if (userObject.access == "admin") {
+      admins = event.admins.concat(userObject.user)
+    }
+    if (userObject.access == "participant") {
+      participants = event.participants.concat(userObject.user)
+    }
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      { admins, participants, pending },
+      { new: true }
+    ).populate('creator', { username: 1 })
+      .populate('admins', { username: 1 })
+      .populate('participants', { username: 1 })
+      .populate('dives')
+      .populate('target')
+
+    res.json(Event.format(updatedEvent))
+
+
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
@@ -119,58 +155,6 @@ eventRouter.post('/:id/admin', async (req, res) => {
       res.status(500).json({ error: 'something went wrong...' })
     }
   }
-})
-*/
-eventRouter.put('/:id/add', async (req, res) => {
-  try {
-    const event = await Event.findById(req.params.id)
-    var admins = event.admins
-    var pending = event.pending
-    var participants = event.participants
-    if (!event.pending.includes(res.locals.user.id)) {
-      return res.status(401).json({ error: 'unauthorized request' })
-    }
-    var userObject
-    var i
-    for (i = 0; i < pending.length; i++) {
-      if (pending[i].user.includes(res.locals.user.id)) {
-        userObject = pending[i]
-        break;
-      }
-
-      if (userObject.access === "admin") {
-        admins = event.admins.concat(userObject.user)
-      }
-      if (userObject.access === "participant") {
-        participants = event.participants.concat(userObject.user)
-      }
-
-      pending.splice(i, 1)
-
-    }
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      { admins, participants, pending },
-      { new: true }
-    ).populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending', { username: 1 })
-      .populate('dives')
-      .populate('target')
-
-    res.json(Event.format(updatedEvent))
-  
-    
-
-  } catch (exception) {
-  if (exception.name === 'JsonWebTokenError') {
-    res.status(401).json({ error: exception.message })
-  } else {
-    console.log(exception)
-    res.status(500).json({ error: 'something went wrong...' })
-  }
-}
 })
 
 
@@ -186,7 +170,9 @@ eventRouter.put('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('creator', { username: 1 })
 
-    if (event.creator.id !== res.locals.user.id || !event.admins.includes(res.locals.user.id)) {
+    console.log(event.creator.id)
+    console.log(res.locals.user.id)
+    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -198,7 +184,6 @@ eventRouter.put('/:id', async (req, res) => {
     ).populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
-      .populate('pending', { username: 1 })
       .populate('dives')
       .populate('target')
 
