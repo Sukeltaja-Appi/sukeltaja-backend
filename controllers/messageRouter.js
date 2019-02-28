@@ -27,32 +27,32 @@ messageRouter.get('/', async (req, res) => {
 
 messageRouter.post('/', async (req, res) => {
     try {
-        const { receievers, created, type, data } = req.body
+        const { receivers, created, type, data } = req.body
         const { user } = res.locals
 
-        if (!receievers) {
+        if (!receivers) {
             return res.status(400).json({ error: 'recievers missing' })
         }
 
-        let recieved = []
-        for (i = 0; i < receievers.length; i++) recieved.push(false);
+        let received = []
+        for (i = 0; i < receivers.length; i++) received.push(false);
 
         const message = new Message({
             sender: user.id,
-            receievers,
+            receivers,
             created,
-            recieved,
+            received,
             type,
             data
         })
 
         const savedMessage = await message.save()
 
-        for (i = 0; i < receievers.length; i++) {
-            var reciever = await User.findById(receievers[i])
-            receiever.messages = reciever.messages.concat(savedMessage.id)
+        for (i = 0; i < receivers.length; i++) {
+            var receiever = await User.findById(receivers[i])
+            receiver.messages = receiver.messages.concat(savedMessage.id)
 
-            await reciever.save()
+            await receiever.save()
         }
 
 

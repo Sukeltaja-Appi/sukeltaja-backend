@@ -2,9 +2,9 @@ const mongoose = require('mongoose')
 
 const messageSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  receievers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  receivers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   created: Date,
-  recieved: [Boolean],
+  received: [String],  // status, possible choises:  pending | receieved | accepted | rejected
   type: String,
   data: {}
 
@@ -14,9 +14,9 @@ messageSchema.statics.format = (message) => {
   return {
     id: message._id,
     sender: message.sender,
-    receievers: message.receievers,
+    receivers: message.receivers,
     created: message.created,
-    recieved: message.recieved,
+    received: message.received,
     type: message.type,
     data: message.data
   }
