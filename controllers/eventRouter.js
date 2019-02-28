@@ -14,6 +14,8 @@ eventRouter.get('/unauth', async (req, res) => {
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
+
+
     res.json(events.map(Event.format))
   } catch (exception) {
 
@@ -26,7 +28,6 @@ eventRouter.get('/unauth', async (req, res) => {
 
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
-
 eventRouter.get('/', async (req, res) => {
   try {
 

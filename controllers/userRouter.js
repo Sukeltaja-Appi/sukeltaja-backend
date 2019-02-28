@@ -22,6 +22,7 @@ userRouter.get('/', async (req, res) => {
 userRouter.get('/:id', async (req, res) => {
   const user = await User.findById(req.params.id)
     .populate('events', { description: 1, startdate: 1, enddate: 1 })
+    .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
 
   res.json(User.format(user))
 })
