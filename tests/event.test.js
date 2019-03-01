@@ -39,7 +39,7 @@ describe('event tests', async () => {
       .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
-    expect(response.body[0].user._id).toBe(user.body[0].id)
+    expect(response.body[0].creator._id).toBe(user.body[0].id)
   })
 
   test('event can be posted', async () => {
@@ -132,7 +132,7 @@ describe('event tests', async () => {
       .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
-    expect(response.body[0].user.username).toBe('SamiSukeltaja')
+    expect(response.body[0].creator.username).toBe('SamiSukeltaja')
   })
 })
 

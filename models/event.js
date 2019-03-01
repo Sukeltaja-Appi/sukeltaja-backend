@@ -5,7 +5,9 @@ const eventSchema = new mongoose.Schema({
   description: String,
   startdate: Date,
   enddate: Date,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  admins: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   target: { type: mongoose.Schema.Types.ObjectId, ref: 'Target' },
   dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }]
 
@@ -18,7 +20,9 @@ eventSchema.statics.format = (event) => {
     description: event.description,
     startdate: event.startdate,
     enddate: event.enddate,
-    user: event.user,
+    creator: event.creator,
+    admins: event.admins,
+    participants: event.participants,
     target: event.target,
     dives: event.dives
   }

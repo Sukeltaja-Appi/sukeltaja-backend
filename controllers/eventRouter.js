@@ -8,7 +8,9 @@ eventRouter.get('/unauth', async (req, res) => {
 
     const events = await Event
       .find({})
-      .populate('user', { username: 1 })
+      .populate('creator', { username: 1 })
+      .populate('admins', { username: 1 })
+      .populate('participants', { username: 1 })
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
@@ -28,9 +30,17 @@ eventRouter.all('*', requireAuthentication)
 eventRouter.get('/', async (req, res) => {
   try {
 
-    const events = await Event
-      .find({})
-      .populate('user', { username: 1 })
+    let events = await Event
+      .find({
+        $or: [
+          { 'creator': res.locals.user.id },
+          { 'admins': { $in: [res.locals.user.id] } },
+          { 'participants': { $in: [res.locals.user.id] } }
+        ]
+      })
+      .populate('creator', { username: 1 })
+      .populate('admins', { username: 1 })
+      .populate('participants', { username: 1 })
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
@@ -48,9 +58,9 @@ eventRouter.get('/', async (req, res) => {
 eventRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
-      .populate('user', { username: 1 })
+      .populate('creator', { username: 1 })
 
-    if (event.user.id !== res.locals.user.id) {
+    if (event.creator.id !== res.locals.user.id) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -76,7 +86,7 @@ eventRouter.post('/', async (req, res) => {
       description,
       startdate: startdate || new Date(),
       enddate: handleEndDate(startdate || new Date(), enddate),
-      user: user.id,
+      creator: user.id,
       dives,
       target
     })
@@ -105,9 +115,9 @@ eventRouter.put('/:id', async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id)
-      .populate('user', { username: 1 })
+      .populate('creator', { username: 1 })
 
-    if (event.user.id !== res.locals.user.id) {
+    if (event.creator.id !== res.locals.user.id) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -115,7 +125,9 @@ eventRouter.put('/:id', async (req, res) => {
       req.params.id,
       { title, description, startdate, enddate, dives, target },
       { new: true }
-    ).populate('user', { username: 1 })
+    ) .populate('creator', { username: 1 })
+      .populate('admins', { username: 1 })
+      .populate('participants', { username: 1 })
       .populate('dives')
       .populate('target')
 

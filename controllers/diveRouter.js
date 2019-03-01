@@ -28,6 +28,7 @@ diveRouter.get('/', async (req, res) => {
   try {
     const dives = await Dive
       .find({})
+      .where('user').equals(res.locals.user.id)
       .populate('user', { username: 1 })
       .populate('event', { title: 1, description: 1 })
 
