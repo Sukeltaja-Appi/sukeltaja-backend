@@ -61,7 +61,7 @@ eventRouter.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('creator', { username: 1 })
 
-    if (event.creator.id !== res.locals.user.id || !event.admins.includes(res.locals.user.id) || !event.participants.includes(res.locals.user.id) || !event.pending.includes(res.locals.user.id)) {
+    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id) && !event.participants.includes(res.locals.user.id) && !event.pending.includes(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
