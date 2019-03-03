@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 
 const targetSchema = new mongoose.Schema({
   name: String,
-  depth: String,
   latitude: {
     type: Number,
     required: true
@@ -11,6 +10,9 @@ const targetSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  type: String,
+  depth: String,
+  material: String,
   hylyt_id: Number,
   hylyt_link: String,
   mj_id: String,
@@ -18,18 +20,23 @@ const targetSchema = new mongoose.Schema({
 })
 
 targetSchema.statics.format = (target) => {
+  const { _id: id, name, latitude, longitude, type, depth, material, hylyt_id, hylyt_link, mj_id, mj_link } = target
+
   return {
-    id: target._id,
-    name: target.name,
-    depth: target.depth,
-    latitude: target.latitude,
-    longitude: target.longitude,
-    hylyt_id: target.hylyt_id,
-    hylyt_link: target.hylyt_link,
-    mj_id: target.mj_id,
-    mj_link: target.mj_link
+    id,
+    name,
+    latitude,
+    longitude,
+    type,
+    depth,
+    material,
+    hylyt_id,
+    hylyt_link,
+    mj_id,
+    mj_link,
   }
 }
+
 const Target = mongoose.model('Target', targetSchema)
 
 module.exports = Target
