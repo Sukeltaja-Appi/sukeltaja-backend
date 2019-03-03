@@ -1,5 +1,6 @@
 const eventRouter = require('express').Router()
 const Event = require('../models/event')
+const User = require('../models/user')
 const requireAuthentication = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
 
@@ -108,6 +109,11 @@ eventRouter.post('/', async (req, res) => {
   }
 })
 
+/*
+This method takes EventID and checks if current token holder has a pending
+invite on the event pending list. If there is match, it adds the user either 
+as participant or admin, according to acces variable ('participant' || 'admin')
+*/
 eventRouter.put('/:id/add', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
@@ -115,18 +121,14 @@ eventRouter.put('/:id/add', async (req, res) => {
     var admins = event.admins
     var pending = event.pending
     var participants = event.participants
-    /*
-    if (!event.pending.includes(res.locals.user.id)) {
-      return res.status(401).json({ error: 'unauthorized request' })
-    }
-    */
     var userObject
     var i
 
     for (i = 0; i < pending.length; i++) {
-      if (pending[i].user === user.id) {
+      if (`${pending[i].user}` === `${user.id}`) {
         userObject = pending[i]
         pending.splice(i, 1)
+
       }
     }
 
@@ -145,6 +147,11 @@ eventRouter.put('/:id/add', async (req, res) => {
       .populate('participants', { username: 1 })
       .populate('dives')
       .populate('target')
+
+    const addedUser = await User.findById(user.id)
+
+    addedUser.events = addedUser.events.concat(updatedEvent.id)
+    await addedUser.save()
 
     res.json(Event.format(updatedEvent))
 
@@ -170,7 +177,7 @@ eventRouter.put('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('creator', { username: 1 })
 
-    console.log(event.creator.id)
+    console.log(event)
     console.log(res.locals.user.id)
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
