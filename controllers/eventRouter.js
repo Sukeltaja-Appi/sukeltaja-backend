@@ -14,8 +14,6 @@ eventRouter.get('/unauth', async (req, res) => {
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
-
-
     res.json(events.map(Event.format))
   } catch (exception) {
 
@@ -23,7 +21,6 @@ eventRouter.get('/unauth', async (req, res) => {
 
     return res.status(500).json({ error: 'something went wrong...' })
   }
-
 })
 
 // From here on require authentication on all routes.
@@ -61,7 +58,12 @@ eventRouter.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('creator', { username: 1 })
 
-    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id) && !event.participants.includes(res.locals.user.id) && !event.pending.includes(res.locals.user.id)) {
+    if (
+      event.creator.id !== res.locals.user.id
+      && !event.admins.includes(res.locals.user.id)
+      && !event.participants.includes(res.locals.user.id)
+      && !event.pending.includes(res.locals.user.id)
+    ) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -120,17 +122,18 @@ eventRouter.put('/:id/add', async (req, res) => {
     */
     var userObject
     var i
+
     for (i = 0; i < pending.length; i++) {
-      if (pending[i].user == user.id) {
+      if (pending[i].user === user.id) {
         userObject = pending[i]
         pending.splice(i, 1)
       }
     }
 
-    if (userObject.access == "admin") {
+    if (userObject.access === 'admin') {
       admins = event.admins.concat(userObject.user)
     }
-    if (userObject.access == "participant") {
+    if (userObject.access === 'participant') {
       participants = event.participants.concat(userObject.user)
     }
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -145,8 +148,6 @@ eventRouter.put('/:id/add', async (req, res) => {
 
     res.json(Event.format(updatedEvent))
 
-
-
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -156,7 +157,6 @@ eventRouter.put('/:id/add', async (req, res) => {
     }
   }
 })
-
 
 // Authorized user can edit own event.
 eventRouter.put('/:id', async (req, res) => {
@@ -175,7 +175,6 @@ eventRouter.put('/:id', async (req, res) => {
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
-
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
