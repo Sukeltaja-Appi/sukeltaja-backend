@@ -111,7 +111,7 @@ eventRouter.post('/', async (req, res) => {
 
 /*
 This method takes EventID and checks if current token holder has a pending
-invite on the event pending list. If there is match, it adds the user either 
+invite on the event pending list. If there is match, it adds the user either
 as participant or admin, according to acces variable ('participant' || 'admin')
 */
 eventRouter.put('/:id/add', async (req, res) => {

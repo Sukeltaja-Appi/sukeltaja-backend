@@ -7,6 +7,7 @@ const requireAuthentication = require('../middleware/authenticate')
 // Returns all current events from database as JSON
 messageRouter.all('*', requireAuthentication)
 
+// Still needs to filter for received status
 messageRouter.get('/', async (req, res) => {
   try {
     const messages = await Message
@@ -36,7 +37,7 @@ messageRouter.post('/', async (req, res) => {
 
     let received = []
 
-    for (let i = 0; i < receivers.length; i++) received.push(false)
+    for (let i = 0; i < receivers.length; i++) received.push('pending')
 
     const message = new Message({
       sender: user.id,
