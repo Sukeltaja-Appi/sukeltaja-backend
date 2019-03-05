@@ -7,8 +7,8 @@ const requireAuthentication = require('../middleware/authenticate')
 BOuserRouter.all('*', requireAuthentication)
 
 BOuserRouter.get('/', async (req, res) => {
-  try{
-    if(!res.locals.user.admin){
+  try {
+    if (!res.locals.user.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -25,12 +25,12 @@ BOuserRouter.get('/', async (req, res) => {
 
 BOuserRouter.post('/', async (req, res) => {
   try {
-    if(res.locals.admin){
+    if (res.locals.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
     const body = req.body
 
-    if (body.username === undefined || body.password === undefined){
+    if (body.username === undefined || body.password === undefined) {
       return res.status(400).json({ error: 'user or password missing' })
     }
 

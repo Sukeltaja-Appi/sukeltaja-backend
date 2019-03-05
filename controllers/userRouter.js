@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 // Returns all current events from database as JSON
 
 userRouter.get('/', async (req, res) => {
-  try{
+  try {
     const users = await User
       .find({})
       .populate('events', { description: 1, startdate: 1, enddate: 1 })
@@ -31,7 +31,7 @@ userRouter.post('/', async (req, res) => {
   try {
     const body = req.body
 
-    if (body.username === undefined || body.password === undefined){
+    if (body.username === undefined || body.password === undefined) {
       return res.status(400).json({ error: 'user or password missing' })
     }
 
