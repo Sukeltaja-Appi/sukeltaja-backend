@@ -5,7 +5,7 @@ const BOUser = require('../models/bouser')
 const getTokenFrom = (req) => {
   const authorization = req.get('authorization')
 
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')){
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     return authorization.substring(7)
   }
 
@@ -39,13 +39,13 @@ const requireAuthentication = async (req, res, next) => {
 
     bouser = await BOUser.findById(decodedToken.id)
 
-    if(!bouser){
+    if (!bouser) {
       return res.status(401).json({ error: 'token missing or invalid' })
     }
   }
-  if(!user){
+  if (!user) {
     res.locals.user = bouser
-  }else{
+  } else {
     res.locals.user = user
   }
 
