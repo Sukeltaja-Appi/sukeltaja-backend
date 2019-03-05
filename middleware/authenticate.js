@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const BOUser = require('../models/bouser')
 
 const getTokenFrom = (req) => {
   const authorization = req.get('authorization')
 
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')){
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     return authorization.substring(7)
   }
 
@@ -32,12 +33,21 @@ const requireAuthentication = async (req, res, next) => {
   }
 
   const user = await User.findById(decodedToken.id)
+  var bouser
 
   if (!user) {
-    return res.status(401).json({ error: 'token missing or invalid' })
-  }
 
-  res.locals.user = user
+    bouser = await BOUser.findById(decodedToken.id)
+
+    if (!bouser) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+  }
+  if (!user) {
+    res.locals.user = bouser
+  } else {
+    res.locals.user = user
+  }
 
   next()
 }

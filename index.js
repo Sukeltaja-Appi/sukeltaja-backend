@@ -11,6 +11,8 @@ const userRouter = require('./controllers/userRouter')
 const loginRouter = require('./controllers/loginRouter')
 const targetRouter = require('./controllers/targetRouter')
 const diveRouter = require('./controllers/diveRouter')
+const messageRouter = require('./controllers/messageRouter')
+const BOuserRouter = require('./controllers/BOuserRouter')
 
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
@@ -42,6 +44,8 @@ app.use(`${config.apiUrl}/users`, userRouter)
 app.use(`${config.apiUrl}/login`, loginRouter)
 app.use(`${config.apiUrl}/targets`, targetRouter)
 app.use(`${config.apiUrl}/dives`, diveRouter)
+app.use(`${config.apiUrl}/messages`, messageRouter)
+app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 
 const server = http.createServer(app)
 

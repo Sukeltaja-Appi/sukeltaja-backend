@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   },
   password: String,
   events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
-  dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }]
+  dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }],
+  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
 })
 
 userSchema.plugin(uniqueValidator)
@@ -18,7 +19,8 @@ userSchema.statics.format = (user) => {
     id: user._id,
     username: user.username,
     events: user.events,
-    dives: user.dives
+    dives: user.dives,
+    messages: user.messages
   }
 }
 const User = mongoose.model('User', userSchema)

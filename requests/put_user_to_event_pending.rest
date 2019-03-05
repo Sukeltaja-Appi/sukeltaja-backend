@@ -1,0 +1,23 @@
+PUT http://localhost:3001/api/events/5c77d753bf82622290a3d8ca
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU1MTM3OTMwM30.NzIoyt1c3Nc_LEMBkrX5Yd2ebJYOvjvVTDOTvRSNVhc
+
+{
+    "_id": "",
+    "admins": [],
+    "participants": [],
+    "pending": [
+        {
+            "user": "5c6e69d3ce7f0e13a4b1fc80",
+            "access": "admin"
+        }
+    ],
+    "dives": [],
+    "description": "Oma sukellustapahtuma 1",
+    "startdate": "2019-02-28T12:42:59.519Z",
+    "enddate": "2019-02-28T12:43:00.696Z",
+    "creator": "5c50563f2da79c31a0a4e7fe",
+    "__v": 0,
+    "target": null,
+    "title": null
+}
