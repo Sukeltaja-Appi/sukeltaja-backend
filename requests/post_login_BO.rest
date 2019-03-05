@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/login/bo
+content-type: application/json
+
+{
+    "username" : "notadmin",
+    "password" : "admin123"
+}

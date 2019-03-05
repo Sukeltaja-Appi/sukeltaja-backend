@@ -1,11 +1,17 @@
 const BOuserRouter = require('express').Router()
-const BOUser = require('../models/BOuser')
+const BOUser = require('../models/bouser')
 const bcrypt = require('bcrypt')
+const requireAuthentication = require('../middleware/authenticate')
 
 // Returns all current events from database as JSON
+BOuserRouter.all('*', requireAuthentication)
 
 BOuserRouter.get('/', async (req, res) => {
   try{
+    if(!res.locals.user.admin){
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
+
     const BOusers = await BOUser
       .find({})
 
@@ -19,6 +25,9 @@ BOuserRouter.get('/', async (req, res) => {
 
 BOuserRouter.post('/', async (req, res) => {
   try {
+    if(res.locals.admin){
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
     const body = req.body
 
     if (body.username === undefined || body.password === undefined){
@@ -31,7 +40,7 @@ BOuserRouter.post('/', async (req, res) => {
     const BOuser = new BOUser({
       username: body.username,
       password: passwordHash,
-      admin: new Boolean(false)
+      admin: false
     })
 
     const savedBOUser = await BOuser.save()

@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/bousers
+content-type: application/json
+
+{
+    "_id": "",
+    "username": "admin",
+    "password": "admin123",
+    "__v": 0
+}
