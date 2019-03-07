@@ -1,5 +1,6 @@
 const messageRouter = require('express').Router()
 const Message = require('../models/message')
+const Event = require('../models/event')
 const User = require('../models/user')
 //const bcrypt = require('bcrypt')
 const requireAuthentication = require('../middleware/authenticate')
@@ -11,23 +12,23 @@ messageRouter.all('*', requireAuthentication)
 messageRouter.get('/', async (req, res) => {
   try {
     const user = User.findById(res.locals)
-      .populate({ path: 'messages', populate: { path: 'sender' } })
-    /*
-    const messages = await User
-      .find({
-        $or: [
-          { 'receivers': { $in: [res.locals.user.id] } }
-        ]
-      })
-      .populate('sender', { username: 1 })
-      */
+      .populate({ path: 'messages', populate: { path: 'sender', { username: 1 }  })
+/*
+const messages = await User
+  .find({
+    $or: [
+      { 'receivers': { $in: [res.locals.user.id] } }
+    ]
+  })
+  .populate('sender', { username: 1 })
+  */
 
-    res.json(user.messages.map(Message.format))
+res.json(user.messages.map(Message.format))
   } catch (exception) {
-    console.log(exception)
+  console.log(exception)
 
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
+  return res.status(500).json({ error: 'something went wrong...' })
+}
 })
 
 // Can be removed once put is edited to only edit a field
@@ -68,6 +69,24 @@ messageRouter.post('/', async (req, res) => {
       data
     })
 
+    const event = await Event.findById(data._id)
+
+    if (type === 'invitation_participant' || type === 'invitation_admin') {
+      var accesstype
+      if (type === 'invitation_admin') {
+        accesstype = 'admin'
+      } else {
+        accesstype = 'participant'
+      }
+      for (i = 0; i < message.receivers.length; i++) {
+        event.pending = event.pending.concat({ user: message.receivers[i], access: accesstype })
+      }
+
+
+      event.save()
+    }
+
+
     const savedMessage = await message.save()
 
     for (let i = 0; i < receivers.length; i++) {
@@ -93,8 +112,8 @@ messageRouter.put('/:id', async (req, res) => {
 
     const message = Message.findById(req.params.id)
 
-    for (let i = 0; i < message.receivers.length; i++){
-      if(message.receivers[i].id === res.locals.id){
+    for (let i = 0; i < message.receivers.length; i++) {
+      if (message.receivers[i].id === res.locals.id) {
         message.received[i] = status
       }
     }
