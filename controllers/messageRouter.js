@@ -69,8 +69,18 @@ messageRouter.post('/', async (req, res) => {
 
 messageRouter.put('/:id', async (req, res) => {
   try {
-    const { recieved } = req.body
+    const { status } = req.body
 
+    const message = Message.findById(req.params.id)
+
+    for (let i = 0; i < message.receivers.length; i++){
+      if(message.receivers[i].id === res.locals.id){
+        message.received[i] = status
+      }
+    }
+    const updatedMessage = await message.save()
+
+    /*
     if (!recieved) {
       return res.status(400).json({ error: 'missing fields' })
     }
@@ -80,6 +90,7 @@ messageRouter.put('/:id', async (req, res) => {
       { recieved },
       { new: true }
     )
+    */
 
     res.json(Message.format(updatedMessage))
 
