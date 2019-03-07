@@ -190,7 +190,7 @@ eventRouter.put('/:id', async (req, res) => {
     ).populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
-      .populate('pending.user')
+      .populate('pending.user', { username: 1 })
       .populate('dives')
       .populate('target')
 
