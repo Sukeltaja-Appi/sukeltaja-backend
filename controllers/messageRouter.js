@@ -10,15 +10,19 @@ messageRouter.all('*', requireAuthentication)
 // Still needs to filter for received status
 messageRouter.get('/', async (req, res) => {
   try {
-    const messages = await Message
+    const user = User.findById(res.locals)
+      .populate({ path: 'messages', populate: { path: 'sender' } })
+    /*
+    const messages = await User
       .find({
         $or: [
           { 'receivers': { $in: [res.locals.user.id] } }
         ]
       })
       .populate('sender', { username: 1 })
+      */
 
-    res.json(messages.map(Message.format))
+    res.json(user.messages.map(Message.format))
   } catch (exception) {
     console.log(exception)
 
