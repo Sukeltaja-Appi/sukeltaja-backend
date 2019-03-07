@@ -40,6 +40,7 @@ eventRouter.get('/', async (req, res) => {
       .populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
+      .populate('pending.user', { username: 1 })
       .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
       .populate('target')
 
@@ -58,6 +59,12 @@ eventRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
       .populate('creator', { username: 1 })
+      .populate('creator', { username: 1 })
+      .populate('admins', { username: 1 })
+      .populate('participants', { username: 1 })
+      .populate('pending.user', { username: 1 })
+      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
+      .populate('target')
 
     if (
       event.creator.id !== res.locals.user.id
@@ -145,6 +152,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     ).populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
+      .populate('pending.user', { username: 1 })
       .populate('dives')
       .populate('target')
 
@@ -190,6 +198,7 @@ eventRouter.put('/:id', async (req, res) => {
     ).populate('creator', { username: 1 })
       .populate('admins', { username: 1 })
       .populate('participants', { username: 1 })
+      .populate('pending.user', { username: 1 })
       .populate('dives')
       .populate('target')
 
