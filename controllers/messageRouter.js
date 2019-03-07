@@ -26,6 +26,9 @@ messageRouter.get('/', async (req, res) => {
   }
 })
 
+// Can be removed once put is edited to only edit a field
+// in received instead of replacing it.
+// (Simultaneous calls from two users)
 messageRouter.get('/:id', async (req, res) => {
   try {
     const message = await Message.findById(req.params.id)
