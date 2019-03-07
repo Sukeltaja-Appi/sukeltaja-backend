@@ -12,7 +12,7 @@ messageRouter.all('*', requireAuthentication)
 messageRouter.get('/', async (req, res) => {
   try {
     const user = User.findById(res.locals)
-      .populate({ path: 'messages', populate: { path: 'sender' } })
+      .populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
     /*
 const messages = await User
   .find({
