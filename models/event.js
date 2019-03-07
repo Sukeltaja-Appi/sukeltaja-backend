@@ -10,7 +10,8 @@ const eventSchema = new mongoose.Schema({
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   pending: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    access: String
+    access: String,
+    username: String
   }],
   target: { type: mongoose.Schema.Types.ObjectId, ref: 'Target' },
   dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }]
