@@ -26,6 +26,19 @@ messageRouter.get('/', async (req, res) => {
   }
 })
 
+messageRouter.get('/:id', async (req, res) => {
+  try {
+    const message = await Message.findById(req.params.id)
+      .populate('sender', { username: 1 })
+
+    res.json(Message.format(message))
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
 messageRouter.post('/', async (req, res) => {
   try {
     const { receivers, created, type, data } = req.body
