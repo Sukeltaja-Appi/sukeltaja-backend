@@ -11,19 +11,26 @@ messageRouter.all('*', requireAuthentication)
 // Still needs to filter for received status
 messageRouter.get('/', async (req, res) => {
   try {
-    const user = User.findById(res.locals)
-      .populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
-    /*
-const messages = await User
-  .find({
-    $or: [
-      { 'receivers': { $in: [res.locals.user.id] } }
-    ]
-  })
-  .populate('sender', { username: 1 })
-  */
+    // const user = User.findById(res.locals.id)
+    //   .populate('messages')
+    //   //.populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
+    //
+    // const messages = user.messages
+    // console.log(user)
+    //
+    // for(let i = 0; i < messages.length; i++) {
+    //   messages[i].sender = { username: messages[i].sender }
+    // }
 
-    res.json(user.messages.map(Message.format))
+    const messages = await Message
+      .find({
+        $or: [
+          { 'receivers': { $in: [res.locals.user.id] } }
+        ]
+      })
+      .populate('sender', { username: 1 })
+
+    res.json(messages.map(Message.format))
   } catch (exception) {
     console.log(exception)
 
