@@ -81,8 +81,8 @@ eventRouter.post('/', async (req, res) => {
     const { title, description, startdate, enddate, dives, target } = req.body
     const { user } = res.locals
 
-    if (!description) {
-      return res.status(400).json({ error: 'description missing' })
+    if (!title) {
+      return res.status(400).json({ error: 'title missing' })
     }
 
     const event = new Event({
