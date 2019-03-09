@@ -122,6 +122,8 @@ invite on the event pending list. If there is match, it adds the user either
 as participant or admin, according to acces variable ('participant' || 'admin')
 */
 eventRouter.put('/:id/add', async (req, res) => {
+  console.log('0.-----------------------------------------------------------------------')
+
   try {
     const event = await Event.findById(req.params.id)
     const { user } = res.locals
@@ -131,6 +133,8 @@ eventRouter.put('/:id/add', async (req, res) => {
     var userObject
     var i
 
+    console.log('1.-------------------------------------------------------------------')
+
     for (i = 0; i < pending.length; i++) {
       if (`${pending[i].user}` === `${user.id}`) {
         userObject = pending[i]
@@ -139,12 +143,17 @@ eventRouter.put('/:id/add', async (req, res) => {
       }
     }
 
+    console.log('2.-------------------------------------------------------------------')
+
     if (userObject.access === 'admin') {
       admins = event.admins.concat(userObject.user)
     }
     if (userObject.access === 'participant') {
       participants = event.participants.concat(userObject.user)
     }
+
+    console.log('3.-------------------------------------------------------------------')
+
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
       { admins, participants, pending },
@@ -156,12 +165,16 @@ eventRouter.put('/:id/add', async (req, res) => {
       .populate('dives')
       .populate('target')
 
+    console.log('4.-------------------------------------------------------------------')
+
     const addedUser = await User.findById(user.id)
 
     addedUser.events = addedUser.events.concat(updatedEvent.id)
     await addedUser.save()
 
     res.json(Event.format(updatedEvent))
+
+    console.log('5.-------------------------------------------------------------------')
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
