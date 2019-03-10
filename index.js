@@ -36,9 +36,7 @@ app.use(middleware.logger)
 app.get('/api', (req, res) => {
   res.send('<h1>Backend API starts here</h1> ')
 })
-app.get('/', (req, res) => {
-  res.send('<h1>Backoffice will be here</h1> ')
-})
+
 app.use(`${config.apiUrl}/events`, eventRouter)
 app.use(`${config.apiUrl}/users`, userRouter)
 app.use(`${config.apiUrl}/login`, loginRouter)
