@@ -20,10 +20,10 @@ const targetSchema = new mongoose.Schema({
 })
 
 targetSchema.statics.format = (target) => {
-  const { _id: id, name, latitude, longitude, type, depth, material, hylyt_id, hylyt_link, mj_id, mj_link } = target
+  const { _id, name, latitude, longitude, type, depth, material, hylyt_id, hylyt_link, mj_id, mj_link } = target
 
   return {
-    id,
+    _id,
     name,
     latitude,
     longitude,

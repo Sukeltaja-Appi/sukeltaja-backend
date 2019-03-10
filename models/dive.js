@@ -10,14 +10,16 @@ const diveSchema = new mongoose.Schema({
 })
 
 diveSchema.statics.format = (dive) => {
+  const { _id, startdate, enddate, user, event, latitude, longitude } = dive
+
   return {
-    id: dive._id,
-    startdate: dive.startdate,
-    enddate: dive.enddate,
-    user: dive.user,
-    event: dive.event,
-    latitude: dive.latitude,
-    longitude: dive.longitude
+    _id,
+    startdate,
+    enddate,
+    user,
+    event,
+    latitude,
+    longitude
   }
 }
 const Dive = mongoose.model('Dive', diveSchema)

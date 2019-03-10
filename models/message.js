@@ -10,14 +10,16 @@ const messageSchema = new mongoose.Schema({
 })
 
 messageSchema.statics.format = (message) => {
+  const { _id, sender, receivers, created, received, type, data } = message
+
   return {
-    id: message._id,
-    sender: message.sender,
-    receivers: message.receivers,
-    created: message.created,
-    received: message.received,
-    type: message.type,
-    data: message.data
+    _id,
+    sender,
+    receivers,
+    created,
+    received,
+    type,
+    data
   }
 }
 const Message = mongoose.model('message', messageSchema)

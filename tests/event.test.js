@@ -39,7 +39,7 @@ describe('event tests', async () => {
       .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
-    expect(response.body[0].creator._id).toBe(user.body[0].id)
+    expect(response.body[0].creator._id).toBe(user.body[0]._id)
   })
 
   test('event can be posted', async () => {
@@ -79,7 +79,7 @@ describe('event tests', async () => {
     eventModify.description = 'Modified content'
 
     await api
-      .put(`${config.apiUrl}/events/${eventModify.id}`)
+      .put(`${config.apiUrl}/events/${eventModify._id}`)
       .set('Authorization', `bearer ${token}`)
       .send(eventModify)
       .expect(200)
@@ -102,7 +102,7 @@ describe('event tests', async () => {
     const event = allEvents.body[1]
 
     const response = await api
-      .get(`${config.apiUrl}/events/${event.id}`)
+      .get(`${config.apiUrl}/events/${event._id}`)
       .set('Authorization', `bearer ${token}`)
 
     expect(response.body.description).toBe('Modified content')
@@ -116,7 +116,7 @@ describe('event tests', async () => {
     const event = allEvents.body[1]
 
     await api
-      .delete(`${config.apiUrl}/events/${event.id}`)
+      .delete(`${config.apiUrl}/events/${event._id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(204)
 
