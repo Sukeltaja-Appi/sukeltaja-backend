@@ -88,8 +88,8 @@ eventRouter.post('/', async (req, res) => {
     const { title, description, startdate, enddate, dives, target } = req.body
     const { user } = res.locals
 
-    if (!description) {
-      return res.status(400).json({ error: 'description missing' })
+    if (!title) {
+      return res.status(400).json({ error: 'missing fields' })
     }
 
     const event = new Event({
@@ -197,7 +197,7 @@ eventRouter.put('/:id', async (req, res) => {
   try {
     const { title, description, startdate, enddate, admins, participants, pending, dives, target } = req.body
 
-    if (!description) {
+    if (!title) {
       return res.status(400).json({ error: 'missing fields' })
     }
 

@@ -15,12 +15,14 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(uniqueValidator)
 
 userSchema.statics.format = (user) => {
+  const { _id, username, events, dives, messages } = user
+
   return {
-    id: user._id,
-    username: user.username,
-    events: user.events,
-    dives: user.dives,
-    messages: user.messages
+    _id,
+    username,
+    events,
+    dives,
+    messages
   }
 }
 const User = mongoose.model('User', userSchema)

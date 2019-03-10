@@ -18,18 +18,20 @@ const eventSchema = new mongoose.Schema({
 })
 
 eventSchema.statics.format = (event) => {
+  const { _id, title, description, startdate, enddate, creator, admins, participants, pending, target, dives } = event
+
   return {
-    id: event._id,
-    title: event.title,
-    description: event.description,
-    startdate: event.startdate,
-    enddate: event.enddate,
-    creator: event.creator,
-    admins: event.admins,
-    participants: event.participants,
-    pending: event.pending,
-    target: event.target,
-    dives: event.dives
+    _id,
+    title,
+    description,
+    startdate,
+    enddate,
+    creator,
+    admins,
+    participants,
+    pending,
+    target,
+    dives
   }
 }
 const Event = mongoose.model('Event', eventSchema)

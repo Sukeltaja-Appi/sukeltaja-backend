@@ -13,10 +13,12 @@ const BOuserSchema = new mongoose.Schema({
 BOuserSchema.plugin(uniqueValidator)
 
 BOuserSchema.statics.format = (BOuser) => {
+  const { _id, username, admin } = BOuser
+
   return {
-    id: BOuser._id,
-    username: BOuser.username,
-    admin: BOuser.admin
+    _id,
+    username,
+    admin
   }
 }
 const BOUser = mongoose.model('BOUser', BOuserSchema)
