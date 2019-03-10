@@ -8,3 +8,7 @@ npm-debug.*
 coverage/
 .env
 .vscode/
+
+# macOS
+.DS_Store
+
