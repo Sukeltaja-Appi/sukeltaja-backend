@@ -27,7 +27,7 @@ describe('event tests', async () => {
       .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
-    expect(response.body[0].description).toBe('Suomen vanhin hylky, huono sää.')
+    expect(response.body[0].title).toBe('Suomen vanhin hylky, huono sää.')
   })
 
   test('the id of the user of the event can be seen', async () => {
@@ -45,7 +45,7 @@ describe('event tests', async () => {
   test('event can be posted', async () => {
     const newEvent = {
 
-      'description': 'Haikaloja liikkeellä',
+      'title': 'Haikaloja liikkeellä',
       'startdate': '2019-02-15T13:03:22.014Z',
       'enddate': '2019-02-15T14:12:25.128Z',
       'target': null,
@@ -64,7 +64,7 @@ describe('event tests', async () => {
       .get(`${config.apiUrl}/events`)
       .set('Authorization', `bearer ${token}`)
 
-    const contents = response.body.map(r => r.description)
+    const contents = response.body.map(r => r.title)
 
     expect(contents).toContain('Haikaloja liikkeellä')
   })
