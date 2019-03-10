@@ -47,8 +47,6 @@ messageRouter.get('/:id', async (req, res) => {
     const message = await Message.findById(req.params.id)
       .populate('sender', { username: 1 })
 
-    console.log('message:---------------------------------------')
-    console.log(message)
     res.json(Message.format(message))
   } catch (exception) {
     console.log(exception)
@@ -106,7 +104,6 @@ messageRouter.post('/', async (req, res) => {
       await receiver.save()
     }
 
-    console.log(savedMessage)
     res.json(Message.format(savedMessage))
 
   } catch (exception) {
@@ -120,10 +117,6 @@ messageRouter.put('/:id', async (req, res) => {
     const { status } = req.body
 
     const message = await Message.findById(req.params.id)
-
-    console.log('messages:-----------------------------------------------------')
-    console.log(message)
-    console.log('--------------------------------------------------------------')
 
     for (let i = 0; i < message.receivers.length; i++) {
       if (userToID(message.receivers[i]) === res.locals.id) {
