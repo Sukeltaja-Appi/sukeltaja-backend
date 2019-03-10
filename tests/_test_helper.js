@@ -15,7 +15,7 @@ const userObject = {
 
 const eventObjects = [
   {
-    'description': 'Suomen vanhin hylky, huono sää.',
+    'title': 'Suomen vanhin hylky, huono sää.',
     'startdate': '2019-01-15T13:03:22.014Z',
     '__v': 0,
     'enddate': '2019-01-15T14:12:25.128Z',
