@@ -77,7 +77,7 @@ messageRouter.post('/', async (req, res) => {
       data
     })
 
-    const event = await Event.findById(data.id)
+    const event = await Event.findById(userToID(data))
 
     if (type === 'invitation_participant' || type === 'invitation_admin') {
       var accesstype
