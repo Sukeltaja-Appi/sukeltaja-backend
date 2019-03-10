@@ -4,6 +4,7 @@ const Event = require('../models/event')
 const User = require('../models/user')
 //const bcrypt = require('bcrypt')
 const requireAuthentication = require('../middleware/authenticate')
+const { userToID } = require('../utils/userHandler')
 
 // Returns all current events from database as JSON
 messageRouter.all('*', requireAuthentication)
@@ -118,34 +119,18 @@ messageRouter.put('/:id', async (req, res) => {
   try {
     const { status } = req.body
 
-    const message = Message.findById(req.params.id)
+    const message = await Message.findById(req.params.id)
 
     console.log('messages:-----------------------------------------------------')
-    console.log(message)
-    message.populate('receivers')
-    message.populate('received')
-    console.log('messagesPopulated:-----------------------------------------------------')
     console.log(message)
     console.log('--------------------------------------------------------------')
 
     for (let i = 0; i < message.receivers.length; i++) {
-      if (message.receivers[i].id === res.locals.id) {
+      if (userToID(message.receivers[i]) === res.locals.id) {
         message.received[i] = status
       }
     }
     const updatedMessage = await message.save()
-
-    /*
-    if (!recieved) {
-      return res.status(400).json({ error: 'missing fields' })
-    }
-
-    const updatedMessage = await Message.findByIdAndUpdate(
-      req.params.id,
-      { recieved },
-      { new: true }
-    )
-    */
 
     res.json(Message.format(updatedMessage))
 
