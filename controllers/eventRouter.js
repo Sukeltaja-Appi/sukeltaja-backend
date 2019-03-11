@@ -112,6 +112,8 @@ eventRouter.put('/:id/add', async (req, res) => {
 
   try {
     const event = await Event.findById(req.params.id)
+
+    console.log('Event: ' + event)
     const { user } = res.locals
     var admins = event.admins
     var pending = event.pending
@@ -120,18 +122,19 @@ eventRouter.put('/:id/add', async (req, res) => {
     var i
 
     for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user}` === `${user.id}`) {
+      if (`${pending[i].user._id}` === `${user.id}`) {
         userObject = pending[i]
         pending.splice(i, 1)
 
       }
     }
+    console.log('UserObject: ' + userObject)
 
     if (userObject.access === 'admin') {
-      admins = event.admins.concat(userObject.user)
+      admins = event.admins.concat(userObject.user._id)
     }
     if (userObject.access === 'participant') {
-      participants = event.participants.concat(userObject.user)
+      participants = event.participants.concat(userObject.user._id)
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -140,9 +143,9 @@ eventRouter.put('/:id/add', async (req, res) => {
       { new: true }
     ).populate('creator', 'username')
 
-    const addedUser = await User.findById(user.id)
+    const addedUser = await User.findById(user._id)
 
-    addedUser.events = addedUser.events.concat(updatedEvent.id)
+    addedUser.events = addedUser.events.concat(updatedEvent._id)
     await addedUser.save()
 
     res.json(updatedEvent)
