@@ -112,8 +112,6 @@ eventRouter.put('/:id/add', async (req, res) => {
 
   try {
     const event = await Event.findById(req.params.id)
-
-    console.log('Event: ' + event)
     const { user } = res.locals
     var admins = event.admins
     var pending = event.pending
@@ -122,13 +120,12 @@ eventRouter.put('/:id/add', async (req, res) => {
     var i
 
     for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user._id}` === `${user.id}`) {
+      if (`${pending[i].user._id}` === `${user._id}`) {
         userObject = pending[i]
         pending.splice(i, 1)
 
       }
     }
-    console.log('UserObject: ' + userObject)
 
     if (userObject.access === 'admin') {
       admins = event.admins.concat(userObject.user._id)
