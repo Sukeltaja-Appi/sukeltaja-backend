@@ -3,7 +3,7 @@ const Event = require('../models/event')
 const User = require('../models/user')
 const requireAuthentication = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
-const { userToID, userIsInArray } = require('../utils/userHandler')
+const { userIsInArray } = require('../utils/userHandler')
 
 eventRouter.get('/unauth', async (req, res) => {
   try {
