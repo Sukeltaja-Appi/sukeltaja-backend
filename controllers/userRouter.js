@@ -27,8 +27,8 @@ userRouter.post('/', async (req, res) => {
   try {
     const body = req.body
 
-    if (body.username === undefined || body.password === undefined) {
-      return res.status(400).json({ error: 'user or password missing' })
+    if (!body.username || !body.password) {
+      return res.status(400).json({ error: 'username or password missing' })
     }
 
     const saltRounds = 10
