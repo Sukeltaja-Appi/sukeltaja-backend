@@ -29,7 +29,7 @@ messageRouter.get('/', async (req, res) => {
           { 'receivers': { $in: [res.locals.user.id] } }
         ]
       })
-      .populate('sender', { username: 1 })
+      .populate('sender', 'username')
 
     res.json(messages.map(Message.format))
   } catch (exception) {

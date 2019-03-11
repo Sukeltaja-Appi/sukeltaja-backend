@@ -1,39 +1,26 @@
 const mongoose = require('mongoose')
+const autopopulate = require('mongoose-autopopulate')
+
+const { ObjectId } = mongoose.Schema.Types
 
 const eventSchema = new mongoose.Schema({
   title: String,
   description: String,
   startdate: Date,
   enddate: Date,
-  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  admins: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  creator: { type: ObjectId, ref: 'User' },
+  admins: [{ type: ObjectId, ref: 'User', autopopulate: true }],
+  participants: [{ type: ObjectId, ref: 'User', autopopulate: true }],
   pending: [{
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    user: { type: ObjectId, ref: 'User', autopopulate: true },
     access: String
   }],
-  target: { type: mongoose.Schema.Types.ObjectId, ref: 'Target' },
-  dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }]
-
+  target: { type: ObjectId, ref: 'Target', autopopulate: true },
+  dives: [{ type: ObjectId, ref: 'Dive', autopopulate: true }]
 })
 
-eventSchema.statics.format = (event) => {
-  const { _id, title, description, startdate, enddate, creator, admins, participants, pending, target, dives } = event
+eventSchema.plugin(autopopulate)
 
-  return {
-    _id,
-    title,
-    description,
-    startdate,
-    enddate,
-    creator,
-    admins,
-    participants,
-    pending,
-    target,
-    dives
-  }
-}
 const Event = mongoose.model('Event', eventSchema)
 
 module.exports = Event
