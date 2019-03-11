@@ -3,20 +3,14 @@ const Event = require('../models/event')
 const User = require('../models/user')
 const requireAuthentication = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
-const { userToID, userIsInArray } = require('../utils/userHandler')
+const { userIsInArray } = require('../utils/userHandler')
 
 eventRouter.get('/unauth', async (req, res) => {
   try {
 
-    const events = await Event
-      .find({})
-      .populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
-      .populate('target')
+    const events = await Event.find({})
 
-    res.json(events.map(Event.format))
+    res.json(events)
   } catch (exception) {
 
     console.log(exception)
@@ -30,7 +24,7 @@ eventRouter.all('*', requireAuthentication)
 eventRouter.get('/', async (req, res) => {
   try {
 
-    let events = await Event
+    const events = await Event
       .find({
         $or: [
           { 'creator': res.locals.user.id },
@@ -38,14 +32,9 @@ eventRouter.get('/', async (req, res) => {
           { 'participants': { $in: [res.locals.user.id] } }
         ]
       })
-      .populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending.user', { username: 1 })
-      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
-      .populate('target')
+      .populate('creator', 'username')
 
-    res.json(events.map(Event.format))
+    res.json(events)
   } catch (exception) {
 
     console.log(exception)
@@ -59,12 +48,7 @@ eventRouter.get('/', async (req, res) => {
 eventRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
-      .populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending.user', { username: 1 })
-      .populate('dives', { user: 1, event: 1, latitude: 1, longitude: 1 })
-      .populate('target')
+      .populate('creator', 'username')
 
     if (
       event.creator.id !== res.locals.user.id
@@ -75,7 +59,7 @@ eventRouter.get('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    res.json(Event.format(event))
+    res.json(event)
 
   } catch (exception) {
     return res.status(500).json({ error: 'something went wrong...' })
@@ -110,22 +94,7 @@ eventRouter.post('/', async (req, res) => {
     user.events = user.events.concat(savedEvent.id)
     await user.save()
 
-    // This is done to make creator field return creator username
-    // because doing: creator: {username: user.id, id: user.id}
-    // Did not work
-    const editedEvent = await Event.findByIdAndUpdate(
-      savedEvent.id
-    ).populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending.user', { username: 1 })
-      .populate('dives')
-      .populate('target')
-
-    console.log('editedEvent-------------------------------------------------------')
-    console.log(editedEvent)
-
-    res.json(Event.format(editedEvent))
+    res.json(savedEvent)
 
   } catch (exception) {
     console.log(exception)
@@ -151,7 +120,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     var i
 
     for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user}` === `${user.id}`) {
+      if (`${pending[i].user._id}` === `${user._id}`) {
         userObject = pending[i]
         pending.splice(i, 1)
 
@@ -159,29 +128,24 @@ eventRouter.put('/:id/add', async (req, res) => {
     }
 
     if (userObject.access === 'admin') {
-      admins = event.admins.concat(userObject.user)
+      admins = event.admins.concat(userObject.user._id)
     }
     if (userObject.access === 'participant') {
-      participants = event.participants.concat(userObject.user)
+      participants = event.participants.concat(userObject.user._id)
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
       { admins, participants, pending },
       { new: true }
-    ).populate('creator', { usgetOngoingername: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending.user', { username: 1 })
-      .populate('dives')
-      .populate('target')
+    ).populate('creator', 'username')
 
-    const addedUser = await User.findById(user.id)
+    const addedUser = await User.findById(user._id)
 
-    addedUser.events = addedUser.events.concat(updatedEvent.id)
+    addedUser.events = addedUser.events.concat(updatedEvent._id)
     await addedUser.save()
 
-    res.json(Event.format(updatedEvent))
+    res.json(updatedEvent)
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -202,11 +166,10 @@ eventRouter.put('/:id', async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id)
-      .populate('creator', { username: 1 })
+      .populate('creator', 'username')
 
-    console.log(event)
-    console.log(res.locals.user.id)
-    if (userToID(event.creator) !== res.locals.user.id && !userIsInArray(res.locals.user.id, event.admins)) {
+    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
+
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -214,14 +177,9 @@ eventRouter.put('/:id', async (req, res) => {
       req.params.id,
       { title, description, startdate, enddate, admins, participants, pending, dives, target },
       { new: true }
-    ).populate('creator', { username: 1 })
-      .populate('admins', { username: 1 })
-      .populate('participants', { username: 1 })
-      .populate('pending.user', { username: 1 })
-      .populate('dives')
-      .populate('target')
+    )
 
-    res.json(Event.format(updatedEvent))
+    res.json(updatedEvent)
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
