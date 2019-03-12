@@ -7,9 +7,9 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   password: String,
-  events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
-  dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive' }],
-  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
+  events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event', autopopulate: true }],
+  dives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dive', autopopulate: true }],
+  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message', autopopulate: true }]
 })
 
 userSchema.plugin(uniqueValidator)
@@ -25,6 +25,7 @@ userSchema.statics.format = (user) => {
     messages
   }
 }
+
 const User = mongoose.model('User', userSchema)
 
 module.exports = User

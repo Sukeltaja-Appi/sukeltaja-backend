@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
 
+const { ObjectId } = mongoose.Schema.Types
+
 const diveSchema = new mongoose.Schema({
   startdate: Date,
   enddate: Date,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
+  user: { type: ObjectId, ref: 'User', autopopulate: { select: 'username' } },
+  event: { type: ObjectId, ref: 'Event' },
   latitude: Number,
   longitude: Number
 })
@@ -22,6 +24,7 @@ diveSchema.statics.format = (dive) => {
     longitude
   }
 }
+
 const Dive = mongoose.model('Dive', diveSchema)
 
 module.exports = Dive
