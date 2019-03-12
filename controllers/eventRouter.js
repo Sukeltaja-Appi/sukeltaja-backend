@@ -7,7 +7,6 @@ const { userIsInArray } = require('../utils/userHandler')
 
 eventRouter.get('/unauth', async (req, res) => {
   try {
-
     const events = await Event.find({})
 
     res.json(events)
@@ -21,15 +20,33 @@ eventRouter.get('/unauth', async (req, res) => {
 
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
+
+eventRouter.get('/bo', async (req, res) => {
+  try {
+    console.log(res.locals)
+    if (!res.locals.admin) {
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
+    const events = await Event.find({})
+
+    res.json(events)
+  } catch (exception) {
+
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
 eventRouter.get('/', async (req, res) => {
   try {
 
     const events = await Event
       .find({
         $or: [
-          { 'creator': res.locals.user.id },
-          { 'admins': { $in: [res.locals.user.id] } },
-          { 'participants': { $in: [res.locals.user.id] } }
+          { 'creator': res.locals.user._id },
+          { 'admins': { $in: [res.locals.user._id] } },
+          { 'participants': { $in: [res.locals.user._id] } }
         ]
       })
       .populate('creator', 'username')
@@ -47,7 +64,7 @@ eventRouter.get('/', async (req, res) => {
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id)
+    const event = await Event.findById(req.params._id)
       .populate('creator', 'username')
 
     if (
