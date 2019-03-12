@@ -9,8 +9,6 @@ diveRouter.get('/unauth', async (req, res) => {
   try {
     const dives = await Dive
       .find({})
-      .populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
 
     res.json(dives.map(Dive.format))
   } catch (exception) {
@@ -29,8 +27,6 @@ diveRouter.get('/', async (req, res) => {
     const dives = await Dive
       .find({})
       .where('user').equals(res.locals.user.id)
-      .populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
 
     res.json(dives.map(Dive.format))
   } catch (exception) {
@@ -98,7 +94,6 @@ diveRouter.put('/:id', async (req, res) => {
     }
 
     const dive = await Dive.findById(req.params.id)
-      .populate('user', 'username')
 
     if (dive.user.id !== res.locals.user.id) {
       return res.status(401).json({ error: 'unauthorized request' })
@@ -108,8 +103,7 @@ diveRouter.put('/:id', async (req, res) => {
       req.params.id,
       { startdate, enddate, event, latitude, longitude },
       { new: true }
-    ).populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
+    )
 
     res.json(Dive.format(updatedDive))
 

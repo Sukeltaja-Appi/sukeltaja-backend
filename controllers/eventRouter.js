@@ -49,7 +49,6 @@ eventRouter.get('/', async (req, res) => {
           { 'participants': { $in: [res.locals.user._id] } }
         ]
       })
-      .populate('creator', 'username')
 
     res.json(events)
   } catch (exception) {
@@ -65,7 +64,6 @@ eventRouter.get('/', async (req, res) => {
 eventRouter.get('/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params._id)
-      .populate('creator', 'username')
 
     if (
       event.creator.id !== res.locals.user.id
@@ -155,7 +153,7 @@ eventRouter.put('/:id/add', async (req, res) => {
       req.params.id,
       { admins, participants, pending },
       { new: true }
-    ).populate('creator', 'username')
+    )
 
     const addedUser = await User.findById(user._id)
 
@@ -183,7 +181,6 @@ eventRouter.put('/:id', async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id)
-      .populate('creator', 'username')
 
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
 
