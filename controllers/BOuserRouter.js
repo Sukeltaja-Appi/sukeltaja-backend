@@ -8,7 +8,7 @@ BOuserRouter.all('*', requireAuthentication)
 
 BOuserRouter.get('/', async (req, res) => {
   try {
-    if (!res.locals.user.admin) {
+    if (!res.locals.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
