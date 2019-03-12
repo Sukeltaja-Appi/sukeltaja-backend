@@ -13,15 +13,9 @@ messageRouter.all('*', requireAuthentication)
 messageRouter.get('/', async (req, res) => {
   try {
     // const user = User.findById(res.locals.id)
-    //   .populate('messages')
-    //   //.populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
+    //   .populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
     //
-    // const messages = user.messages
-    // console.log(user)
-    //
-    // for(let i = 0; i < messages.length; i++) {
-    //   messages[i].sender = { username: messages[i].sender }
-    // }
+    // res.json(user.messages.map(Message.format))
 
     const messages = await Message
       .find({
@@ -39,9 +33,6 @@ messageRouter.get('/', async (req, res) => {
   }
 })
 
-// Can be removed once put is edited to only edit a field
-// in received instead of replacing it.
-// (Simultaneous calls from two users)
 messageRouter.get('/:id', async (req, res) => {
   try {
     const message = await Message.findById(req.params.id)
