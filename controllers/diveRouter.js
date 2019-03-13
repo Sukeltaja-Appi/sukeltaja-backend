@@ -64,7 +64,7 @@ diveRouter.post('/', async (req, res) => {
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
-    console.log(savedDive)
+
     res.json(Dive.format(savedDive))
 
   } catch (exception) {
