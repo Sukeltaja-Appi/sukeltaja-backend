@@ -29,11 +29,11 @@ eventSchema.statics.format = (event) => {
     startdate,
     enddate,
     creator,
-    admins,
-    participants,
-    pending,
+    admins: admins.toObject(),
+    participants: participants.toObject(),
+    pending: pending.toObject(),
     target,
-    dives
+    dives: dives.toObject()
   }
 }
 
