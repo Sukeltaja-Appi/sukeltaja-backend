@@ -63,7 +63,7 @@ eventRouter.get('/', async (req, res) => {
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
-    const event = await Event.findById(req.params._id)
+    const event = await Event.findById(req.params.id)
 
     if (
       event.creator.id !== res.locals.user.id
