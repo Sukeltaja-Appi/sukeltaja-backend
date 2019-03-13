@@ -29,7 +29,7 @@ eventRouter.get('/bo', async (req, res) => {
     }
     const events = await Event.find({})
 
-    res.json(events)
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -50,7 +50,7 @@ eventRouter.get('/', async (req, res) => {
         ]
       })
 
-    res.json(events)
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -74,7 +74,7 @@ eventRouter.get('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    res.json(event)
+    res.json(Event.format(event))
 
   } catch (exception) {
     return res.status(500).json({ error: 'something went wrong...' })
@@ -109,7 +109,7 @@ eventRouter.post('/', async (req, res) => {
     user.events = user.events.concat(savedEvent.id)
     await user.save()
 
-    res.json(savedEvent)
+    res.json(Event.format(savedEvent))
 
   } catch (exception) {
     console.log(exception)
@@ -160,7 +160,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     addedUser.events = addedUser.events.concat(updatedEvent._id)
     await addedUser.save()
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -193,7 +193,7 @@ eventRouter.put('/:id', async (req, res) => {
       { new: true }
     )
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
