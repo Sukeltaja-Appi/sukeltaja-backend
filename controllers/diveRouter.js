@@ -95,7 +95,7 @@ diveRouter.put('/:id', async (req, res) => {
 
     const dive = await Dive.findById(req.params.id)
 
-    if (dive.user.id !== res.locals.user.id) {
+    if (!dive.user.equals(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
