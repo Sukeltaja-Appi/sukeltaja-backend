@@ -101,6 +101,7 @@ eventRouter.post('/', async (req, res) => {
     })
 
     const savedEvent = await event.save()
+      .then(event => event.populate('creator', 'username').execPopulate())
 
     user.events = user.events.concat(savedEvent.id)
     await user.save()
