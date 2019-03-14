@@ -1,8 +1,11 @@
 const mongoose = require('mongoose')
+const autopopulate = require('mongoose-autopopulate')
+
+const { ObjectId } = mongoose.Schema.Types
 
 const messageSchema = new mongoose.Schema({
-  sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: { select: 'username' } },
-  receivers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: { select: 'username' } }],
+  sender: { type: ObjectId, ref: 'User', autopopulate: { select: 'username' } },
+  receivers: [{ type: ObjectId, ref: 'User', autopopulate: { select: 'username' } }],
   created: Date,
   received: [String], // status, possible choices:  pending | received | accepted | rejected
   type: String,
@@ -23,6 +26,8 @@ messageSchema.statics.format = (message) => {
   }
 }
 
-const Message = mongoose.model('message', messageSchema)
+messageSchema.plugin(autopopulate)
+
+const Message = mongoose.model('Message', messageSchema)
 
 module.exports = Message

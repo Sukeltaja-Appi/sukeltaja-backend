@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const autopopulate = require('mongoose-autopopulate')
 
 const { ObjectId } = mongoose.Schema.Types
 
@@ -24,6 +25,8 @@ diveSchema.statics.format = (dive) => {
     longitude
   }
 }
+
+diveSchema.plugin(autopopulate)
 
 const Dive = mongoose.model('Dive', diveSchema)
 
