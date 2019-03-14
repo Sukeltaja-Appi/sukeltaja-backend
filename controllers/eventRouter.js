@@ -125,25 +125,24 @@ eventRouter.put('/:id/add', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
     const { user } = res.locals
-    var admins = event.admins
-    var pending = event.pending
-    var participants = event.participants
-    var userObject
-    var i
 
-    for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user._id}` === `${user._id}`) {
-        userObject = pending[i]
-        pending.splice(i, 1)
-
-      }
+    if (!event) {
+      return res.status(404).json({ error: 'event not found' })
     }
 
-    if (userObject.access === 'admin') {
-      admins = event.admins.concat(userObject.user._id)
+    let { admins, pending, participants } = event
+    const invite = pending.find(invite => invite.user.equals(user._id))
+
+    if (!invite) {
+      return res.status(401).json({ error: 'unauthorized request' })
     }
-    if (userObject.access === 'participant') {
-      participants = event.participants.concat(userObject.user._id)
+
+    pending = pending.filter(() => !invite)
+
+    if (invite.access === 'admin') {
+      admins = event.admins.concat(user._id)
+    } else if (invite.access === 'participant') {
+      participants = event.participants.concat(user._id)
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
