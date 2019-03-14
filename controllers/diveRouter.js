@@ -48,7 +48,7 @@ diveRouter.post('/', async (req, res) => {
 
     const dive = new Dive({
       startdate: startdate || new Date(),
-      enddate: handleEndDate(startdate || new Date(), enddate),
+      enddate: enddate,
       event: event,
       user: user.id,
       latitude,
