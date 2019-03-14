@@ -2,7 +2,6 @@ const diveRouter = require('express').Router()
 const Dive = require('../models/dive')
 const requireAuthentication = require('../middleware/authenticate')
 const Event = require('../models/event')
-const handleEndDate = require('../middleware/dates')
 
 // This will be removed later
 diveRouter.get('/unauth', async (req, res) => {
