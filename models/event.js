@@ -8,16 +8,34 @@ const eventSchema = new mongoose.Schema({
   description: String,
   startdate: Date,
   enddate: Date,
-  creator: { type: ObjectId, ref: 'User' },
-  admins: [{ type: ObjectId, ref: 'User', autopopulate: true }],
-  participants: [{ type: ObjectId, ref: 'User', autopopulate: true }],
+  creator: { type: ObjectId, ref: 'User', autopopulate: { select: 'username' } },
+  admins: [{ type: ObjectId, ref: 'User', autopopulate: { select: 'username' } }],
+  participants: [{ type: ObjectId, ref: 'User', autopopulate: { select: 'username' } }],
   pending: [{
-    user: { type: ObjectId, ref: 'User', autopopulate: true },
+    user: { type: ObjectId, ref: 'User', autopopulate: { select: 'username' } },
     access: String
   }],
   target: { type: ObjectId, ref: 'Target', autopopulate: true },
-  dives: [{ type: ObjectId, ref: 'Dive', autopopulate: true }]
+  dives: [{ type: ObjectId, ref: 'Dive' }]
 })
+
+eventSchema.statics.format = (event) => {
+  const { _id, title, description, startdate, enddate, creator, admins, participants, pending, target, dives } = event
+
+  return {
+    _id,
+    title,
+    description,
+    startdate,
+    enddate,
+    creator,
+    admins: admins.toObject(),
+    participants: participants.toObject(),
+    pending: pending.toObject(),
+    target,
+    dives: dives.toObject()
+  }
+}
 
 eventSchema.plugin(autopopulate)
 

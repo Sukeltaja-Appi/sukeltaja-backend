@@ -23,13 +23,12 @@ eventRouter.all('*', requireAuthentication)
 
 eventRouter.get('/bo', async (req, res) => {
   try {
-    console.log(res.locals)
     if (!res.locals.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
     const events = await Event.find({})
 
-    res.json(events)
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -49,9 +48,8 @@ eventRouter.get('/', async (req, res) => {
           { 'participants': { $in: [res.locals.user._id] } }
         ]
       })
-      .populate('creator', 'username')
 
-    res.json(events)
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -64,8 +62,7 @@ eventRouter.get('/', async (req, res) => {
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
-    const event = await Event.findById(req.params._id)
-      .populate('creator', 'username')
+    const event = await Event.findById(req.params.id)
 
     if (
       event.creator.id !== res.locals.user.id
@@ -76,7 +73,7 @@ eventRouter.get('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    res.json(event)
+    res.json(Event.format(event))
 
   } catch (exception) {
     return res.status(500).json({ error: 'something went wrong...' })
@@ -104,14 +101,12 @@ eventRouter.post('/', async (req, res) => {
     })
 
     const savedEvent = await event.save()
-
-    console.log('creator')
-    console.log(savedEvent.creator)
+      .then(event => event.populate('creator', 'username').execPopulate())
 
     user.events = user.events.concat(savedEvent.id)
     await user.save()
 
-    res.json(savedEvent)
+    res.json(Event.format(savedEvent))
 
   } catch (exception) {
     console.log(exception)
@@ -130,39 +125,38 @@ eventRouter.put('/:id/add', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
     const { user } = res.locals
-    var admins = event.admins
-    var pending = event.pending
-    var participants = event.participants
-    var userObject
-    var i
 
-    for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user._id}` === `${user._id}`) {
-        userObject = pending[i]
-        pending.splice(i, 1)
-
-      }
+    if (!event) {
+      return res.status(404).json({ error: 'event not found' })
     }
 
-    if (userObject.access === 'admin') {
-      admins = event.admins.concat(userObject.user._id)
+    let { admins, pending, participants } = event
+    const invite = pending.find(invite => invite.user.equals(user._id))
+
+    if (!invite) {
+      return res.status(401).json({ error: 'unauthorized request' })
     }
-    if (userObject.access === 'participant') {
-      participants = event.participants.concat(userObject.user._id)
+
+    pending = pending.filter(() => !invite)
+
+    if (invite.access === 'admin') {
+      admins = event.admins.concat(user._id)
+    } else if (invite.access === 'participant') {
+      participants = event.participants.concat(user._id)
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
       { admins, participants, pending },
       { new: true }
-    ).populate('creator', 'username')
+    )
 
     const addedUser = await User.findById(user._id)
 
     addedUser.events = addedUser.events.concat(updatedEvent._id)
     await addedUser.save()
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -183,7 +177,6 @@ eventRouter.put('/:id', async (req, res) => {
     }
 
     const event = await Event.findById(req.params.id)
-      .populate('creator', 'username')
 
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
 
@@ -196,7 +189,7 @@ eventRouter.put('/:id', async (req, res) => {
       { new: true }
     )
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {

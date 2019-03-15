@@ -23,7 +23,6 @@ messageRouter.get('/', async (req, res) => {
           { 'receivers': { $in: [res.locals.user.id] } }
         ]
       })
-      .populate('sender', 'username')
 
     res.json(messages.map(Message.format))
   } catch (exception) {
@@ -36,7 +35,6 @@ messageRouter.get('/', async (req, res) => {
 messageRouter.get('/:id', async (req, res) => {
   try {
     const message = await Message.findById(req.params.id)
-      .populate('sender', { username: 1 })
 
     res.json(Message.format(message))
   } catch (exception) {

@@ -30,7 +30,7 @@ BOuserRouter.post('/', async (req, res) => {
     }
     const body = req.body
 
-    if (body.username === undefined || body.password === undefined) {
+    if (!body.username || !body.password) {
       return res.status(400).json({ error: 'user or password missing' })
     }
 
