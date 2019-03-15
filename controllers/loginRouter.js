@@ -8,6 +8,10 @@ loginRouter.post('/', async (req, res) => {
   const body = req.body
 
   const user = await User.findOne({ username: body.username })
+    .populate({ path: 'events', options: { autopopulate: false } })
+    .populate({ path: 'dives', options: { autopopulate: false } })
+    .populate({ path: 'messages', options: { autopopulate: false } })
+
   const passwordCorrect = !user
     ? false
     : await bcrypt.compare(body.password, user.password)
