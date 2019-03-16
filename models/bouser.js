@@ -21,6 +21,7 @@ BOuserSchema.statics.format = (BOuser) => {
     admin
   }
 }
+
 const BOUser = mongoose.model('BOUser', BOuserSchema)
 
 module.exports = BOUser

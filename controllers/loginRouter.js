@@ -8,6 +8,10 @@ loginRouter.post('/', async (req, res) => {
   const body = req.body
 
   const user = await User.findOne({ username: body.username })
+    .populate({ path: 'events', options: { autopopulate: false } })
+    .populate({ path: 'dives', options: { autopopulate: false } })
+    .populate({ path: 'messages', options: { autopopulate: false } })
+
   const passwordCorrect = !user
     ? false
     : await bcrypt.compare(body.password, user.password)
@@ -23,14 +27,14 @@ loginRouter.post('/', async (req, res) => {
 
   const token = jwt.sign(userForToken, process.env.SECRET)
 
-  res.status(200).send({ token, username: user.username, id: user._id })
+  res.status(200).send({ token, ...User.format(user) })
 })
 
 loginRouter.post('/BO', async (req, res) => {
   const body = req.body
 
   const BOuser = await BOUser.findOne({ username: body.username })
-  const passwordCorrect = BOuser === null
+  const passwordCorrect = !BOuser
     ? false
     : await bcrypt.compare(body.password, BOuser.password)
 
