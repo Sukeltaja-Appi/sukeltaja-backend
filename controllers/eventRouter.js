@@ -137,7 +137,7 @@ eventRouter.put('/:id/add', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    pending = pending.filter(p => p !== invite)
+    pending = pending.filter(p => p.user._id !== invite.user._id)
 
     if (invite.access === 'admin') {
       admins = event.admins.concat(user._id)
