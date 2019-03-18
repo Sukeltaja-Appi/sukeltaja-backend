@@ -10,11 +10,11 @@ let token, eventsAtStart, anothersEvent, nonExistingEventId
 beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
-})
+}, 30000)
 
 beforeEach(async () => {
   eventsAtStart = await eventsInDb()
-}, 30000)
+})
 
 describe('basic event tests', async () => {
 
