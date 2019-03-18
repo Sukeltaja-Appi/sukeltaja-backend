@@ -10,6 +10,7 @@ let token, eventsAtStart, anothersEvent, nonExistingEventId
 beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
+  jest.setTimeout(30000)
 })
 
 beforeEach(async () => {

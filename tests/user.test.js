@@ -10,6 +10,7 @@ beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
   initialUsernames = Object.values(initialUsers).map(u => u.username)
+  jest.setTimeout(30000)
 })
 
 describe('User', async () => {
