@@ -2,30 +2,133 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 const config = require('../utils/config')
-const { initializeDb, login } = require('./_test_helper')
+const { initialUsers, initializeDb, usersInDb, login } = require('./helpers/testHelper.js')
 
-let token
+let token, initialUsernames
 
 beforeAll(async () => {
   await initializeDb()
-  token = await login()
+  token = await login(initialUsers.SamiSukeltaja)
+  initialUsernames = Object.values(initialUsers).map(u => u.username)
 })
 
-describe('user tests', async () => {
-  test('users are returned as json', async () => {
-    await api
-      .get(`${config.apiUrl}/users`)
-      .set('Authorization', `bearer ${token}`)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
+describe('User', async () => {
+
+  describe('with valid parameters', async () => {
+    test('all users are returned', async () => {
+      const response = await api
+        .get(`${config.apiUrl}/users`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const usernames = response.body.map(r => r.username)
+
+      expect(response.body.length).toBe(2)
+      expect(usernames).toEqual(initialUsernames)
+    })
+
+    test('a single user can be returned', async () => {
+      const users = await usersInDb()
+
+      const { _id } = users[0]
+
+      const response = await api
+        .get(`${config.apiUrl}/users/${_id}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(response.body.username).toBe(initialUsernames[0])
+    })
+
+    test('a new user can be posted', async () => {
+      const usersAtStart = await usersInDb()
+
+      const newUser = {
+        username: 'MeriMies',
+        password: '123123Salasana'
+      }
+
+      await api
+        .post(`${config.apiUrl}/users`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newUser)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAfterOperation = await usersInDb()
+
+      expect(usersAfterOperation.length).toEqual(usersAtStart.length + 1)
+
+      const usernames = usersAfterOperation.map(u => u.username)
+
+      expect(usernames).toContain(newUser.username)
+    })
   })
 
-  test('username of the first user is correct', async () => {
-    const response = await api
-      .get(`${config.apiUrl}/users`)
-      .set('Authorization', `bearer ${token}`)
+  describe('with invalid username', async () => {
+    test('a new user cannot be posted', async () => {
+      const usersAtStart = await usersInDb()
 
-    expect(response.body[0].username).toBe('SamiSukeltaja')
+      const newUser = {
+        username: '',
+        password: '123123Salasana'
+      }
+
+      await api
+        .post(`${config.apiUrl}/users`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAfterOperation = await usersInDb()
+
+      expect(usersAtStart).toEqual(usersAfterOperation)
+    })
+
+    test('a user with an existing username cannot be posted', async () => {
+      const usersAtStart = await usersInDb()
+
+      const newUser = {
+        username: 'KalleKalastaja',
+        password: '234234Salasana'
+      }
+
+      await api
+        .post(`${config.apiUrl}/users`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAfterOperation = await usersInDb()
+
+      expect(usersAtStart).toEqual(usersAfterOperation)
+    })
+  })
+
+  describe('with invalid password', async () => {
+    test('a new user cannot be posted', async () => {
+      const usersAtStart = await usersInDb()
+
+      const newUser = {
+        username: 'JoukoJäämies',
+        password: ''
+      }
+
+      await api
+        .post(`${config.apiUrl}/users`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAfterOperation = await usersInDb()
+
+      expect(usersAtStart).toEqual(usersAfterOperation)
+    })
   })
 })
 

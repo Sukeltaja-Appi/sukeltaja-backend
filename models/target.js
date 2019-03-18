@@ -33,7 +33,7 @@ targetSchema.statics.format = (target) => {
     hylyt_id,
     hylyt_link,
     mj_id,
-    mj_link,
+    mj_link
   }
 }
 

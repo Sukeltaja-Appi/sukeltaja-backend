@@ -1,5 +1,6 @@
 
 const userToID = (obj) => {
+  if ( typeof obj === 'string' ) return obj
   if ( typeof obj !== 'undefined' ) {
     if ( typeof obj.id !== 'undefined' ) return obj.id
     if ( typeof obj.user !== 'undefined' ) {
@@ -15,6 +16,7 @@ const userToID = (obj) => {
 }
 
 const userEqualsUser = (user1, user2) => {
+
   if(typeof user1 === 'undefined' || typeof user2 === 'undefined') return false
 
   if ( typeof user1.username !== 'undefined'
@@ -23,7 +25,7 @@ const userEqualsUser = (user1, user2) => {
   }
 
   let id1 = userToID(user1)
-  let id2 = userToID(user1)
+  let id2 = userToID(user2)
 
   return id1 === id2
 }
@@ -36,8 +38,17 @@ const userIsInArray = (user, users) => {
   return false
 }
 
+const userIndex = (user, users) => {
+  for(let i = 0; i < users.length; i++) {
+    if(userEqualsUser(user, users[i])) return i
+  }
+
+  return null
+}
+
 module.exports = {
   userToID,
   userEqualsUser,
-  userIsInArray
+  userIsInArray,
+  userIndex
 }

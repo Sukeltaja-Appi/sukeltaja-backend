@@ -1,146 +1,298 @@
 const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
-const { initializeDb, login } = require('./_test_helper')
 const config = require('../utils/config')
+const { eventsInDb, initializeDb, login } = require('./helpers/testHelper')
+const { initialEvents, initialUsers } = require('./helpers/initialData')
 
-let token
+let token, eventsAtStart, anothersEvent, nonExistingEventId
 
 beforeAll(async () => {
   await initializeDb()
-  token = await login()
+  token = await login(initialUsers.SamiSukeltaja)
+})
 
+beforeEach(async () => {
+  eventsAtStart = await eventsInDb()
 })
 
 describe('basic event tests', async () => {
 
-  test('events are returned as json', async () => {
-    await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
+  describe('an authorized user', async () => {
+
+    beforeAll(async () => {
+      const events = await eventsInDb()
+
+      anothersEvent = events[2]
+    })
+
+    test('cannot retrieve anothers event', async () => {
+      await api
+        .get(`${config.apiUrl}/events/${anothersEvent._id}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+    })
+
+    test('cannot modify anothers event', async () => {
+      const initialTitles = eventsAtStart.map(e => e.title)
+
+      anothersEvent.title = 'Muokattu otsikko, joka epäonnistuu'
+
+      const eventsAfterOperation = await eventsInDb()
+
+      const titles = eventsAfterOperation.map(e => e.title)
+
+      expect(initialTitles).toEqual(titles)
+    })
+
+    test('cannot delete anothers event', async () => {
+      await api
+        .delete(`${config.apiUrl}/events/${anothersEvent._id}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
+
+    test('can retrieve all events they have created', async () => {
+      const response = await api
+        .get(`${config.apiUrl}/events`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const creators = response.body.map(r => r.creator.username)
+
+      expect(response.body.length).toBe(2)
+      expect(creators).not.toContain('KalleKalastaja')
+    })
+
+    test('can retrieve a single event they have created', async () => {
+      const { _id } = eventsAtStart[1]
+
+      const response = await api
+        .get(`${config.apiUrl}/events/${_id}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(response.body.title).toEqual(initialEvents[1].title)
+    })
+
+    test('can post a new event', async () => {
+      const newEvent = {
+        'title': 'Haikaloja liikkeellä',
+        'startdate': '2019-02-15T13:03:22.014Z',
+        'enddate': '2019-02-15T14:12:25.128Z',
+        'target': null,
+        'dives': []
+      }
+
+      await api
+        .post(`${config.apiUrl}/events`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newEvent)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      expect(eventsAfterOperation.length).toBe(eventsAtStart.length + 1)
+
+      const titles = eventsAfterOperation.map(e => e.title)
+
+      expect(titles).toContain(newEvent.title)
+    })
+
+    test('can modify their own event', async () => {
+      const event = eventsAtStart[1]
+      const initialTitle = event.title
+
+      event.title = 'Muokattu otsikko, joka onnistuu'
+
+      await api
+        .put(`${config.apiUrl}/events/${event._id}`)
+        .set('Authorization', `bearer ${token}`)
+        .send(event)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      const titles = eventsAfterOperation.map(e => e.title)
+
+      expect(titles).toContain(event.title)
+      expect(titles).not.toContain(initialTitle)
+    })
+
+    test('can delete their own event', async () => {
+      const event = eventsAtStart[1]
+
+      await api
+        .delete(`${config.apiUrl}/events/${event._id}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(204)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      expect(eventsAfterOperation.length).toBe(eventsAtStart.length - 1)
+
+      const titles = eventsAfterOperation.map(e => e.title)
+
+      expect(titles).not.toContain(event.title)
+    })
   })
 
-  test('the first event content is correct', async () => {
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
+  describe('an unauthorized user', async () => {
+    test('cannot retrieve all events', async () => {
+      await api
+        .get(`${config.apiUrl}/events`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+    })
 
-    expect(response.body[0].title).toBe('Suomen vanhin hylky, huono sää.')
+    test('cannot retrieve a single event', async () => {
+      const events = await eventsInDb()
+
+      const { _id } = events[0]
+
+      await api
+        .get(`${config.apiUrl}/events/${_id}`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+    })
+
+    test('cannot post a new event', async () => {
+      const newEvent = {
+        'title': 'Suuri merisukellus',
+        'startdate': '2019-02-15T13:03:22.014Z',
+        'enddate': '2019-02-15T14:12:25.128Z',
+        'target': null,
+        'dives': []
+      }
+
+      const eventsAtStart = await eventsInDb()
+
+      await api
+        .post(`${config.apiUrl}/events`)
+        .send(newEvent)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
+
+    test('cannot modify an existing event', async () => {
+      const event = eventsAtStart[0]
+
+      const initialTitles = eventsAtStart.map(e => e.title)
+
+      event.title = 'Muokattu epäonnistuva otsikko'
+
+      await api
+        .put(`${config.apiUrl}/events/${event._id}`)
+        .send(event)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      const titles = eventsAfterOperation.map(e => e.title)
+
+      expect(initialTitles).toEqual(titles)
+    })
+
+    test('cannot delete an existing event', async () => {
+      const event = eventsAtStart[0]
+
+      await api
+        .delete(`${config.apiUrl}/events/${event._id}`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      const eventsAfterOperation = await eventsInDb()
+
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
   })
 
-  test('the id of the user of the event can be seen', async () => {
-    const user = await api
-      .get(`${config.apiUrl}/users`)
-      .set('Authorization', `bearer ${token}`)
+  // // TODO: FIX proper status codes
 
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
+  describe('status codes', async () => {
 
-    expect(response.body[0].creator._id).toBe(user.body[0]._id)
-  })
+    beforeAll(async () => {
+      nonExistingEventId = '5c8fc1d0f1aab62879b8c56d'
+    })
 
-  test('dives of the event can be seen', async () => {
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
+    test('(404) GET nonexisting valid id', async () => {
+      await api
+        .get(`${config.apiUrl}/events/${nonExistingEventId}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
+    })
 
-    expect(response.body[0].dives.length).toBe(1)
-  })
+    test('(400) GET invalid id', async () => {
+      await api
+        .get(`${config.apiUrl}/events/1`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+    })
 
-  test('event can be posted', async () => {
-    const newEvent = {
+    test('(404) PUT nonexisting valid id', async () => {
+      await api
+        .put(`${config.apiUrl}/events/${nonExistingEventId}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
 
-      'title': 'Haikaloja liikkeellä',
-      'startdate': '2019-02-15T13:03:22.014Z',
-      'enddate': '2019-02-15T14:12:25.128Z',
-      'target': null,
-      'dives': [],
+      const eventsAfterOperation = await eventsInDb()
 
-    }
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
 
-    await api
-      .post(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-      .send(newEvent)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
+    test('(400) PUT invalid id', async () => {
+      await api
+        .get(`${config.apiUrl}/events/1`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
 
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
+      const eventsAfterOperation = await eventsInDb()
 
-    const contents = response.body.map(r => r.title)
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
 
-    expect(contents).toContain('Haikaloja liikkeellä')
-  })
+    test('(404) DELETE nonexisting valid id', async () => {
+      await api
+        .delete(`${config.apiUrl}/events/${nonExistingEventId}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
 
-  test('event can be modified', async () => {
-    const events = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
+      const eventsAfterOperation = await eventsInDb()
 
-    const eventModify = events.body[1]
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
 
-    eventModify.description = 'Modified content'
+    test('(400) DELETE invalid id', async () => {
+      await api
+        .delete(`${config.apiUrl}/events/1`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
 
-    await api
-      .put(`${config.apiUrl}/events/${eventModify._id}`)
-      .set('Authorization', `bearer ${token}`)
-      .send(eventModify)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
+      const eventsAfterOperation = await eventsInDb()
 
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-
-    const contents = response.body.map(r => r.description)
-
-    expect(contents).toContain('Modified content')
-  })
-
-  test('single event can be seen', async () => {
-    const allEvents = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-
-    const event = allEvents.body[1]
-
-    const response = await api
-      .get(`${config.apiUrl}/events/${event._id}`)
-      .set('Authorization', `bearer ${token}`)
-
-    expect(response.body.description).toBe('Modified content')
-  })
-
-  test('event can be deleted', async () => {
-    const allEvents = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-
-    const event = allEvents.body[1]
-
-    await api
-      .delete(`${config.apiUrl}/events/${event._id}`)
-      .set('Authorization', `bearer ${token}`)
-      .expect(204)
-
-    const restEvents = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-
-    expect(restEvents.body.length).toBe(1)
-  })
-
-  test('the user of the event can be seen', async () => {
-    const response = await api
-      .get(`${config.apiUrl}/events`)
-      .set('Authorization', `bearer ${token}`)
-
-    expect(response.body[0].creator.username).toBe('SamiSukeltaja')
+      expect(eventsAtStart).toEqual(eventsAfterOperation)
+    })
   })
 })
 
@@ -228,9 +380,7 @@ describe('more complex event tests', async () => {
     const users = await api
       .get(`${config.apiUrl}/users`)
 
-    const userObject = users.body.filter(user => user.username === 'SepiSukeltaja')
-
-    console.log(userObject[0])
+    const userObject = users.body.filter(user => user.username === 'SamiSukeltaja')
 
     let message = {
       created: new Date(),
@@ -257,7 +407,7 @@ describe('more complex event tests', async () => {
   test('invited user can see the invite message', async () => {
 
     const inviteduser = {
-      'username': 'SepiSukeltaja',
+      'username': 'SamiSukeltaja',
       'password': '123123salasana'
     }
 

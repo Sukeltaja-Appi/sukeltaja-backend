@@ -4,7 +4,7 @@ const Event = require('../models/event')
 const User = require('../models/user')
 //const bcrypt = require('bcrypt')
 const requireAuthentication = require('../middleware/authenticate')
-const { userToID } = require('../utils/userHandler')
+const { userToID, userIndex, userEqualsUser } = require('../utils/userHandler')
 
 // Returns all current events from database as JSON
 messageRouter.all('*', requireAuthentication)
@@ -12,24 +12,16 @@ messageRouter.all('*', requireAuthentication)
 // Still needs to filter for received status
 messageRouter.get('/', async (req, res) => {
   try {
-    // const user = User.findById(res.locals.id)
-    //   .populate('messages')
-    //   //.populate({ path: 'messages', populate: { 'sender': { select: 'username' } } })
-    //
-    // const messages = user.messages
-    // console.log(user)
-    //
-    // for(let i = 0; i < messages.length; i++) {
-    //   messages[i].sender = { username: messages[i].sender }
-    // }
+    const userID = res.locals.user.id
 
-    const messages = await Message
+    let messages = await Message
       .find({
         $or: [
-          { 'receivers': { $in: [res.locals.user._id] } }
+          { 'receivers': { $in: [userID] } }
         ]
       })
-      .populate('sender', 'username')
+
+    messages = messages.filter(m => m.received[userIndex(userID, m.receivers)] === 'pending')
 
     res.json(messages.map(Message.format))
   } catch (exception) {
@@ -39,13 +31,9 @@ messageRouter.get('/', async (req, res) => {
   }
 })
 
-// Can be removed once put is edited to only edit a field
-// in received instead of replacing it.
-// (Simultaneous calls from two users)
 messageRouter.get('/:id', async (req, res) => {
   try {
     const message = await Message.findById(req.params.id)
-      .populate('sender', { username: 1 })
 
     res.json(Message.format(message))
   } catch (exception) {
@@ -112,6 +100,7 @@ messageRouter.post('/', async (req, res) => {
   }
 })
 
+// Sets the given received status for the sender.
 messageRouter.put('/:id', async (req, res) => {
   try {
     const { status } = req.body
@@ -119,11 +108,17 @@ messageRouter.put('/:id', async (req, res) => {
     const message = await Message.findById(req.params.id)
 
     for (let i = 0; i < message.receivers.length; i++) {
-      if (userToID(message.receivers[i]) === res.locals.id) {
+      if (userEqualsUser(message.receivers[i], res.locals.user)) {
         message.received[i] = status
+        break
       }
     }
-    const updatedMessage = await message.save()
+
+    const updatedMessage = await Message.findByIdAndUpdate(
+      req.params.id,
+      { received: message.received },
+      { new: true }
+    )
 
     res.json(Message.format(updatedMessage))
 
