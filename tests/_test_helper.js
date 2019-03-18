@@ -13,6 +13,11 @@ const userObject = {
   'password': '123123salasana'
 }
 
+const userObject2 = {
+  'username': 'SepiSukeltaja',
+  'password': '123123salasana'
+}
+
 const eventObjects = [
   {
     'title': 'Suomen vanhin hylky, huono sää.',
@@ -39,6 +44,11 @@ const postUser = async () => {
   await api
     .post(`${config.apiUrl}/users`)
     .send(userObject)
+    .expect(200)
+
+  await api
+    .post(`${config.apiUrl}/users`)
+    .send(userObject2)
     .expect(200)
 }
 

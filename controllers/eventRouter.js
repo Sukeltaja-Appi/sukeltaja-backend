@@ -88,9 +88,6 @@ eventRouter.post('/', async (req, res) => {
 
     const savedEvent = await event.save()
 
-    console.log('creator')
-    console.log(savedEvent.creator)
-
     user.events = user.events.concat(savedEvent.id)
     await user.save()
 

@@ -26,7 +26,7 @@ messageRouter.get('/', async (req, res) => {
     const messages = await Message
       .find({
         $or: [
-          { 'receivers': { $in: [res.locals.user.id] } }
+          { 'receivers': { $in: [res.locals.user._id] } }
         ]
       })
       .populate('sender', 'username')
