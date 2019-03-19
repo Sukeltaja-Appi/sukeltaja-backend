@@ -1,10 +1,10 @@
 const messageRouter = require('express').Router()
 const Message = require('../models/message')
-const Event = require('../models/event')
 const User = require('../models/user')
+const { messageOkToDelete, handleMessage } = require('./messageController')
 //const bcrypt = require('bcrypt')
 const requireAuthentication = require('../middleware/authenticate')
-const { userToID, userIndex, userEqualsUser } = require('../utils/userHandler')
+const { userIndex, userEqualsUser } = require('../utils/userHandler')
 
 // Returns all current events from database as JSON
 messageRouter.all('*', requireAuthentication)
@@ -65,22 +65,7 @@ messageRouter.post('/', async (req, res) => {
       data
     })
 
-    const event = await Event.findById(userToID(data))
-
-    if (type === 'invitation_participant' || type === 'invitation_admin') {
-      var accesstype
-
-      if (type === 'invitation_admin') {
-        accesstype = 'admin'
-      } else {
-        accesstype = 'participant'
-      }
-      for (let i = 0; i < message.receivers.length; i++) {
-        event.pending = event.pending.concat({ user: message.receivers[i], access: accesstype })
-      }
-
-      event.save()
-    }
+    await handleMessage(message)
 
     const savedMessage = await message.save()
 
@@ -112,6 +97,11 @@ messageRouter.put('/:id', async (req, res) => {
         message.received[i] = status
         break
       }
+    }
+    if (messageOkToDelete(message)){
+      await Message.findByIdAndRemove(req.params.id)
+
+      return res.status(204).end()
     }
 
     const updatedMessage = await Message.findByIdAndUpdate(
