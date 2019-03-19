@@ -14,12 +14,10 @@ messageRouter.get('/', async (req, res) => {
   try {
     const userID = res.locals.user.id
 
-    let messages = await Message
-      .find({
-        $or: [
-          { 'receivers': { $in: [userID] } }
-        ]
-      })
+    const user = await User.findById(userID)
+      .populate('messages')
+
+    let messages = user.messages
 
     messages = messages.filter(m => m.received[userIndex(userID, m.receivers)] === 'pending')
 
