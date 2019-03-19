@@ -1,6 +1,6 @@
 const targetRouter = require('express').Router()
 const Target = require('../models/target')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication } = require('../middleware/authenticate')
 const config = require('../utils/config')
 
 const linkToKyppi = (mj_id) => mj_id ? `${config.kyppiUrl}${mj_id}` : undefined
