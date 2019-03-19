@@ -1,3 +1,0 @@
-GET http://localhost:3001/api/bousers/
-content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vdGFkbWluIiwiaWQiOiI1YzdlYTA0MzRkNWQyYzM5MDAwZGQxNzgiLCJpYXQiOjE1NTE4MDI4NjZ9.hAu6QQbjjMBkmt1aPbEZANNbB3U4ezO2bfUS1NmokLk

@@ -3,7 +3,7 @@ const Message = require('../models/message')
 const User = require('../models/user')
 const { messageOkToDelete, handleMessage } = require('./messageController')
 //const bcrypt = require('bcrypt')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication } = require('../middleware/authenticate')
 const { userIndex, userEqualsUser } = require('../utils/userHandler')
 
 // Returns all current events from database as JSON

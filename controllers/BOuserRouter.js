@@ -1,10 +1,10 @@
 const BOuserRouter = require('express').Router()
 const BOUser = require('../models/bouser')
 const bcrypt = require('bcrypt')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireBoAuthentication } = require('../middleware/authenticate')
 
 // Returns all current events from database as JSON
-BOuserRouter.all('*', requireAuthentication)
+BOuserRouter.all('*', requireBoAuthentication)
 
 BOuserRouter.get('/', async (req, res) => {
   try {

@@ -1,31 +1,12 @@
 const eventRouter = require('express').Router()
 const Event = require('../models/event')
 const User = require('../models/user')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication, requireBoAuthentication } = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
 eventRouter.get('/unauth', async (req, res) => {
   try {
-    const events = await Event.find({})
-
-    res.json(events)
-  } catch (exception) {
-
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
-
-// From here on require authentication on all routes.
-eventRouter.all('*', requireAuthentication)
-
-eventRouter.get('/bo', async (req, res) => {
-  try {
-    if (!res.locals.admin) {
-      return res.status(401).json({ error: 'unauthorized request' })
-    }
     const events = await Event.find({})
 
     res.json(events.map(Event.format))
@@ -36,6 +17,22 @@ eventRouter.get('/bo', async (req, res) => {
     return res.status(500).json({ error: 'something went wrong...' })
   }
 })
+
+eventRouter.get('/bo', requireBoAuthentication, async (req, res) => {
+  try {
+    const events = await Event.find({})
+
+    res.json(events.map(Event.format))
+  } catch (exception) {
+
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+// From here on require authentication on all routes.
+eventRouter.all('*', requireAuthentication)
 
 eventRouter.get('/', async (req, res) => {
   try {
@@ -68,7 +65,7 @@ eventRouter.get('/:id', async (req, res) => {
     const event = await Event.findById(req.params.id)
 
     if(!event){
-      return res.status(404).json({ error: 'id not valid' })
+      return res.status(404).json({ error: 'wrong id' })
     }
     if (
       event.creator.id !== res.locals.user.id

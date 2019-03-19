@@ -1,6 +1,6 @@
 const diveRouter = require('express').Router()
 const Dive = require('../models/dive')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication } = require('../middleware/authenticate')
 const Event = require('../models/event')
 
 // This will be removed later
