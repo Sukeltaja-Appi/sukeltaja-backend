@@ -2,6 +2,7 @@ const supertest = require('supertest')
 const { app } = require('../index')
 const api = supertest(app)
 const User = require('../models/user')
+const BOUser = require('../models/bouser')
 const Event = require('../models/event')
 const Dive = require('../models/dive')
 const Target = require('../models/target')
@@ -50,6 +51,7 @@ const postUser = async () => {
     .post(`${config.apiUrl}/users`)
     .send(userObject2)
     .expect(200)
+
 }
 
 const login = async () => {
@@ -57,6 +59,19 @@ const login = async () => {
 
   await api
     .post(`${config.apiUrl}/login`)
+    .send(userObject)
+    .expect(200)
+    .then(res => {
+      token = res.body.token
+    })
+
+  return token
+}
+const boLogin = async () => {
+  let token
+
+  await api
+    .post(`${config.apiUrl}/login/bo`)
     .send(userObject)
     .expect(200)
     .then(res => {
@@ -126,4 +141,4 @@ const initializeDb = async () => {
 
 }
 
-module.exports = { initializeDb, login }
+module.exports = { initializeDb, login, boLogin }

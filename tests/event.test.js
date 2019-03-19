@@ -370,6 +370,49 @@ describe('more complex event tests', async () => {
     expect(response.body.dives.length).toBe(1)
   })
 
+  test('user can modify own dive', async () => {
+    const allDives = await api
+      .get(`${config.apiUrl}/dives`)
+      .set('Authorization', `bearer ${token}`)
+
+    const dive = allDives.body[1]
+    const newEnddate = '2020-03-15T14:12:25.128Z'
+
+    dive.enddate = newEnddate
+
+    await api
+      .put(`${config.apiUrl}/dives/${dive._id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send(dive)
+
+    const divesAfter = await api
+      .get(`${config.apiUrl}/dives`)
+      .set('Authorization', `bearer ${token}`)
+
+    const enddates = divesAfter.body.map(e => e.enddate)
+
+    expect(enddates).toContain(newEnddate)
+
+  })
+
+  test('user can delete own dive', async () => {
+    const allDives = await api
+      .get(`${config.apiUrl}/dives`)
+      .set('Authorization', `bearer ${token}`)
+
+    const dive = allDives.body[1]
+
+    await api
+      .delete(`${config.apiUrl}/dives/${dive._id}`)
+      .set('Authorization', `bearer ${token}`)
+
+    const divesAfter = await api
+      .get(`${config.apiUrl}/dives`)
+      .set('Authorization', `bearer ${token}`)
+
+    expect(allDives.body.length-1).toBe(divesAfter.body.length)
+  })
+
   test('creator can invite users to the event', async () => {
     const allEvents = await api
       .get(`${config.apiUrl}/events`)
@@ -404,7 +447,7 @@ describe('more complex event tests', async () => {
     expect(response.body.pending.length).toBe(1)
   })
 
-  test('invited user can see the invite message', async () => {
+  test('invited user can see and accept the invite message', async () => {
 
     const inviteduser = {
       'username': 'SamiSukeltaja',
@@ -423,6 +466,30 @@ describe('more complex event tests', async () => {
       .set('Authorization', `bearer ${invUserToken}`)
 
     expect(response.body.length).toBe(1)
+
+    response.body[0].status = 'accepted'
+    const message = await api
+      .get(`${config.apiUrl}/messages/${response.body[0]._id}`)
+      .set('Authorization', `bearer ${invUserToken}`)
+
+    await api
+      .put(`${config.apiUrl}/messages/${response.body[0]._id}`)
+      .set('Authorization', `bearer ${invUserToken}`)
+      .send(response.body[0])
+
+    expect(message.body.type).toBe('invitation_participant')
+    /*
+    await api
+      .put(`${config.apiUrl}/events/${response.body[0].data._id}`)
+      .set('Authorization', `bearer ${invUserToken}`)
+
+    const event = await api
+      .get(`${config.apiUrl}/events/${response.body[0].data._id}`)
+      .set('Authorization', `bearer ${invUserToken}`)
+    
+    expect(event.body.participants).toContain('SamiSukeltaja')
+    */
+
   })
 })
 
