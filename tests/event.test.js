@@ -5,18 +5,18 @@ const config = require('../utils/config')
 const { eventsInDb, initializeDb, login } = require('./helpers/testHelper')
 const { initialEvents, initialUsers } = require('./helpers/initialData')
 
-let token, eventsAtStart, anothersEvent
+let token, eventsAtStart, anothersEvent, nonExistingEventId
 
 beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
-})
+}, 30000)
 
 beforeEach(async () => {
   eventsAtStart = await eventsInDb()
 })
 
-describe('Event', async () => {
+describe('basic event tests', async () => {
 
   describe('an authorized user', async () => {
 
@@ -39,13 +39,6 @@ describe('Event', async () => {
 
       anothersEvent.title = 'Muokattu otsikko, joka epäonnistuu'
 
-      await api
-        .put(`${config.apiUrl}/events/${anothersEvent._id}`)
-        .set('Authorization', `bearer ${token}`)
-        .send(anothersEvent)
-        .expect(401)
-        .expect('Content-Type', /application\/json/)
-
       const eventsAfterOperation = await eventsInDb()
 
       const titles = eventsAfterOperation.map(e => e.title)
@@ -53,7 +46,6 @@ describe('Event', async () => {
       expect(initialTitles).toEqual(titles)
     })
 
-    // TODO: FIX users being able to delete events they don't own
     test('cannot delete anothers event', async () => {
       await api
         .delete(`${config.apiUrl}/events/${anothersEvent._id}`)
@@ -231,8 +223,13 @@ describe('Event', async () => {
   })
 
   // // TODO: FIX proper status codes
-  /*
+
   describe('status codes', async () => {
+
+    beforeAll(async () => {
+      nonExistingEventId = '5c8fc1d0f1aab62879b8c56d'
+    })
+
     test('(404) GET nonexisting valid id', async () => {
       await api
         .get(`${config.apiUrl}/events/${nonExistingEventId}`)
@@ -275,7 +272,7 @@ describe('Event', async () => {
 
     test('(404) DELETE nonexisting valid id', async () => {
       await api
-        .delete(`/events/${nonExistingEventId}`)
+        .delete(`${config.apiUrl}/events/${nonExistingEventId}`)
         .set('Authorization', `bearer ${token}`)
         .expect(404)
         .expect('Content-Type', /application\/json/)
@@ -296,7 +293,137 @@ describe('Event', async () => {
 
       expect(eventsAtStart).toEqual(eventsAfterOperation)
     })
-  })*/
+  })
+})
+
+describe('more complex event tests', async () => {
+  test('creator can set target for new event', async () => {
+    const newEvent = {
+
+      'title': 'Haikaloja liikkeellä',
+      'startdate': '2019-02-15T13:03:22.014Z',
+      'enddate': '2019-02-15T14:12:25.128Z',
+      'target': null,
+      'dives': [],
+
+    }
+
+    await api
+      .post(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+      .send(newEvent)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const allEvents = await api
+      .get(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+
+    const targets = await api
+      .get(`${config.apiUrl}/targets`)
+
+    const target = targets.body[0]
+    const event = allEvents.body[1]
+
+    event.target = target
+
+    await api
+      .put(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send(event)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api
+      .get(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+
+    expect(response.body.target.name).toBe('Ruotohylky')
+  })
+
+  test('creator can add dives to the event', async () => {
+    const allEvents = await api
+      .get(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+
+    const event = allEvents.body[1]
+    const diveObject = {
+
+      'startdate': '2019-03-15T13:03:22.014Z',
+      'enddate': '2019-03-15T14:12:25.128Z',
+      'event': `${event._id}`,
+      'longitude': '60.5525',
+      'latitude': '24.1232',
+      '__v': 0
+    }
+
+    await api
+      .post(`${config.apiUrl}/dives`)
+      .set('Authorization', `bearer ${token}`)
+      .send(diveObject)
+      .expect(200)
+
+    const response = await api
+      .get(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+
+    expect(response.body.dives.length).toBe(1)
+  })
+
+  test('creator can invite users to the event', async () => {
+    const allEvents = await api
+      .get(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+
+    const event = allEvents.body[1]
+
+    const users = await api
+      .get(`${config.apiUrl}/users`)
+
+    const userObject = users.body.filter(user => user.username === 'SamiSukeltaja')
+
+    let message = {
+      created: new Date(),
+      receivers: [
+        userObject[0]._id
+      ],
+      type: 'invitation_participant',
+      data: event
+    }
+
+    await api
+      .post(`${config.apiUrl}/messages`)
+      .set('Authorization', `bearer ${token}`)
+      .send(message)
+      .expect(200)
+
+    const response = await api
+      .get(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+
+    expect(response.body.pending.length).toBe(1)
+  })
+
+  test('invited user can see the invite message', async () => {
+
+    const inviteduser = {
+      'username': 'SamiSukeltaja',
+      'password': '123123salasana'
+    }
+
+    const log = await api
+      .post(`${config.apiUrl}/login`)
+      .send(inviteduser)
+      .expect(200)
+
+    const invUserToken = log.body.token
+
+    const response = await api
+      .get(`${config.apiUrl}/messages`)
+      .set('Authorization', `bearer ${invUserToken}`)
+
+    expect(response.body.length).toBe(1)
+  })
 })
 
 afterAll(async () => {

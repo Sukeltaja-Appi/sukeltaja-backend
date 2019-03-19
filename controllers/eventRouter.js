@@ -62,8 +62,14 @@ eventRouter.get('/', async (req, res) => {
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'id not valid' })
+    }
     const event = await Event.findById(req.params.id)
 
+    if(!event){
+      return res.status(404).json({ error: 'id not valid' })
+    }
     if (
       event.creator.id !== res.locals.user.id
       && !userIsInArray(res.locals.user.id, event.admins)
@@ -76,7 +82,11 @@ eventRouter.get('/:id', async (req, res) => {
     res.json(Event.format(event))
 
   } catch (exception) {
-    return res.status(500).json({ error: 'something went wrong...' })
+    if (exception.name === 'CastError') {
+      res.status(404).json({ error: exception.message })
+    } else {
+      res.status(500).json({ error: 'something went wrong...' })
+    }
   }
 })
 
@@ -137,7 +147,7 @@ eventRouter.put('/:id/add', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    pending = pending.filter(() => !invite)
+    pending = pending.filter(p => p.user._id !== invite.user._id)
 
     if (invite.access === 'admin') {
       admins = event.admins.concat(user._id)
@@ -172,11 +182,17 @@ eventRouter.put('/:id', async (req, res) => {
   try {
     const { title, description, startdate, enddate, admins, participants, pending, dives, target } = req.body
 
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'invalid id' })
+    }
+    const event = await Event.findById(req.params.id)
+
+    if(!event){
+      return res.status(404).json({ error: 'wrong id' })
+    }
     if (!title) {
       return res.status(400).json({ error: 'missing fields' })
     }
-
-    const event = await Event.findById(req.params.id)
 
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
 
@@ -192,11 +208,11 @@ eventRouter.put('/:id', async (req, res) => {
     res.json(Event.format(updatedEvent))
 
   } catch (exception) {
+    console.log(exception.name)
     if (exception.name === 'JsonWebTokenError') {
-      res.status(401).json({ error: exception.message })
+      return res.status(401).json({ error: exception.message })
     } else {
-      console.log(exception)
-      res.status(500).json({ error: 'something went wrong...' })
+      return res.status(500).json({ error: 'something went wrong...' })
     }
   }
 })
@@ -204,7 +220,17 @@ eventRouter.put('/:id', async (req, res) => {
 // Authorized user can delete own event.
 eventRouter.delete('/:id', async (req, res) => {
   try {
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'invalid id' })
+    }
     const event = await Event.findById(req.params.id)
+
+    if(!event){
+      return res.status(404).json({ error: 'wrong id' })
+    }
+    if (event.creator.id !== res.locals.user.id){
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
 
     if (event.dives.length > 0) {
       res.status(401).json({ error: 'delete dives first' })
@@ -214,7 +240,8 @@ eventRouter.delete('/:id', async (req, res) => {
 
     res.status(204).end()
   } catch (exception) {
-    res.status(400).send({ error: 'malformatted id' })
+    console.log(exception.name)
+    res.status(500).send({ error: exception.message })
   }
 })
 

@@ -10,7 +10,7 @@ beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
   initialUsernames = Object.values(initialUsers).map(u => u.username)
-})
+}, 30000)
 
 describe('User', async () => {
 
@@ -88,7 +88,6 @@ describe('User', async () => {
       expect(usersAtStart).toEqual(usersAfterOperation)
     })
 
-    // TODO: FIX proper status code
     test('a user with an existing username cannot be posted', async () => {
       const usersAtStart = await usersInDb()
 
