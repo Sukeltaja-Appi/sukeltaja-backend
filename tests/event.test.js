@@ -486,7 +486,7 @@ describe('more complex event tests', async () => {
     const event = await api
       .get(`${config.apiUrl}/events/${response.body[0].data._id}`)
       .set('Authorization', `bearer ${invUserToken}`)
-    
+
     expect(event.body.participants).toContain('SamiSukeltaja')
     */
 
