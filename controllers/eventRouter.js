@@ -2,7 +2,7 @@ const eventRouter = require('express').Router()
 const Event = require('../models/event')
 const User = require('../models/user')
 const { requireAuthentication, requireBoAuthentication } = require('../middleware/authenticate')
-const { emitter } = require('./emitter')
+const { server } = require('./emitter')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
@@ -166,7 +166,7 @@ eventRouter.put('/:id/add', async (req, res) => {
 
     res.json(Event.format(updatedEvent))
 
-    emitter.emit('updatedEvent', req.params.id, user._id)
+    server.emit('updatedEvent', req.params.id, user._id)
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
@@ -208,7 +208,7 @@ eventRouter.put('/:id', async (req, res) => {
 
     res.json(Event.format(updatedEvent))
 
-    emitter.emit('updatedEvent', req.params.id, res.locals.user._id)
+    server.emit('updatedEvent', req.params.id, res.locals.user._id)
 
   } catch (exception) {
     console.log(exception.name)

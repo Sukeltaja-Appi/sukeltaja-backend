@@ -1,10 +1,19 @@
 const Event = require('../models/event')
 const Message = require('../models/message')
 //const User = require('../models/user')
-const emitter = require('events').EventEmitter()
+//const EventEmitter = require('events').EventEmitter
+const { app } = require('../index')
 const { userEqualsUser } = require('../utils/userHandler')
+const http = require('http')
+const server = http.createServer(app)
+/*
+server.listen(config.port, () => {
+  console.log(`Server running on port ${config.port}`)
+  console.log(`API root starts at ${config.apiUrl}`)
+})
+*/
 
-emitter.on('start', () => {
+server.on('start', () => {
   console.log('emitter started!')
 })
 
@@ -22,7 +31,7 @@ const sendIfNotSender = (user, senderID, type, data) => {
 }
 
 // Sends updated event to all participants.
-emitter.on('updatedEvent', (eventID, senderID) => {
+server.on('updatedEvent', (eventID, senderID) => {
   const event = new Event.findByID(eventID)
 
   sendIfNotSender(event.creator, senderID, 'updatedEvent', event)
@@ -38,21 +47,23 @@ emitter.on('updatedEvent', (eventID, senderID) => {
 })
 
 // Sends a new message to all receivers.
-emitter.on('newMessage', (message) => {
-
+server.on('newMessage', (message) => {
+  /*
   for (let i = 0; i < message.receivers.length; i++) {
     send(message.receivers[i], 'newMessage', Message.format(message))
   }
+  */
 
   console.log('newMessage emitted!', message)
 })
 
 const subscribe = (req, res) => {
   // Still needs to be implemented!
-  console.log('subscribe called: ', req, res)
+  console.log('subscribe called: ')
+  server.emit('start')
 }
 
 module.exports = {
-  emitter, // Is used in controllers to trigger logic 'events'
+  server, // Is used in controllers to trigger logic 'events'
   subscribe, // Sending emitter data to clients
 }
