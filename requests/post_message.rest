@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/messages/
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkthbGxlS2FwdGVlbmkiLCJpZCI6IjVjNTA1NjNmMmRhNzljMzFhMGE0ZTdmZSIsImlhdCI6MTU1MzI2MzM4N30.U98G2JEm5MMqOjAUbRHcwAhzl37fIBoowVpTa9A6yYM
+
+{
+    "created": "2019-02-07T18:22:08.333Z",
+    "receivers": ["5c8ba7ddc3b77a3650c2f8cf"],
+    "type": "invitation_participant",
+    "data": "Event"
+}
+

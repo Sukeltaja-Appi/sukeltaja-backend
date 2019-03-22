@@ -49,10 +49,6 @@ app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 
 app.get(`${config.apiUrl}/push`, subscribe)
 
-app.listen(5001, () => {
-  console.log('Listening on', 5001)
-})
-
 const server = http.createServer(app)
 
 server.listen(config.port, () => {
