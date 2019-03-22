@@ -1,16 +1,28 @@
 const eventRouter = require('express').Router()
 const Event = require('../models/event')
 const User = require('../models/user')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication, requireBoAuthentication } = require('../middleware/authenticate')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
 eventRouter.get('/unauth', async (req, res) => {
   try {
-
     const events = await Event.find({})
 
-    res.json(events)
+    res.json(events.map(Event.format))
+  } catch (exception) {
+
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
+eventRouter.get('/bo', requireBoAuthentication, async (req, res) => {
+  try {
+    const events = await Event.find({})
+
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -21,20 +33,20 @@ eventRouter.get('/unauth', async (req, res) => {
 
 // From here on require authentication on all routes.
 eventRouter.all('*', requireAuthentication)
+
 eventRouter.get('/', async (req, res) => {
   try {
 
     const events = await Event
       .find({
         $or: [
-          { 'creator': res.locals.user.id },
-          { 'admins': { $in: [res.locals.user.id] } },
-          { 'participants': { $in: [res.locals.user.id] } }
+          { 'creator': res.locals.user._id },
+          { 'admins': { $in: [res.locals.user._id] } },
+          { 'participants': { $in: [res.locals.user._id] } }
         ]
       })
-      .populate('creator', 'username')
 
-    res.json(events)
+    res.json(events.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -47,9 +59,14 @@ eventRouter.get('/', async (req, res) => {
 // Fetches single event for authorized user.
 eventRouter.get('/:id', async (req, res) => {
   try {
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'id not valid' })
+    }
     const event = await Event.findById(req.params.id)
-      .populate('creator', 'username')
 
+    if(!event){
+      return res.status(404).json({ error: 'wrong id' })
+    }
     if (
       event.creator.id !== res.locals.user.id
       && !userIsInArray(res.locals.user.id, event.admins)
@@ -59,10 +76,14 @@ eventRouter.get('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
-    res.json(event)
+    res.json(Event.format(event))
 
   } catch (exception) {
-    return res.status(500).json({ error: 'something went wrong...' })
+    if (exception.name === 'CastError') {
+      res.status(404).json({ error: exception.message })
+    } else {
+      res.status(500).json({ error: 'something went wrong...' })
+    }
   }
 })
 
@@ -87,14 +108,12 @@ eventRouter.post('/', async (req, res) => {
     })
 
     const savedEvent = await event.save()
-
-    console.log('creator')
-    console.log(savedEvent.creator)
+      .then(event => event.populate('creator', 'username').execPopulate())
 
     user.events = user.events.concat(savedEvent.id)
     await user.save()
 
-    res.json(savedEvent)
+    res.json(Event.format(savedEvent))
 
   } catch (exception) {
     console.log(exception)
@@ -113,39 +132,38 @@ eventRouter.put('/:id/add', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
     const { user } = res.locals
-    var admins = event.admins
-    var pending = event.pending
-    var participants = event.participants
-    var userObject
-    var i
 
-    for (i = 0; i < pending.length; i++) {
-      if (`${pending[i].user._id}` === `${user._id}`) {
-        userObject = pending[i]
-        pending.splice(i, 1)
-
-      }
+    if (!event) {
+      return res.status(404).json({ error: 'event not found' })
     }
 
-    if (userObject.access === 'admin') {
-      admins = event.admins.concat(userObject.user._id)
+    let { admins, pending, participants } = event
+    const invite = pending.find(invite => invite.user.equals(user._id))
+
+    if (!invite) {
+      return res.status(401).json({ error: 'unauthorized request' })
     }
-    if (userObject.access === 'participant') {
-      participants = event.participants.concat(userObject.user._id)
+
+    pending = pending.filter(p => p.user._id !== invite.user._id)
+
+    if (invite.access === 'admin') {
+      admins = event.admins.concat(user._id)
+    } else if (invite.access === 'participant') {
+      participants = event.participants.concat(user._id)
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
       { admins, participants, pending },
       { new: true }
-    ).populate('creator', 'username')
+    )
 
     const addedUser = await User.findById(user._id)
 
     addedUser.events = addedUser.events.concat(updatedEvent._id)
     await addedUser.save()
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -161,12 +179,17 @@ eventRouter.put('/:id', async (req, res) => {
   try {
     const { title, description, startdate, enddate, admins, participants, pending, dives, target } = req.body
 
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'invalid id' })
+    }
+    const event = await Event.findById(req.params.id)
+
+    if(!event){
+      return res.status(404).json({ error: 'wrong id' })
+    }
     if (!title) {
       return res.status(400).json({ error: 'missing fields' })
     }
-
-    const event = await Event.findById(req.params.id)
-      .populate('creator', 'username')
 
     if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
 
@@ -179,14 +202,14 @@ eventRouter.put('/:id', async (req, res) => {
       { new: true }
     )
 
-    res.json(updatedEvent)
+    res.json(Event.format(updatedEvent))
 
   } catch (exception) {
+    console.log(exception.name)
     if (exception.name === 'JsonWebTokenError') {
-      res.status(401).json({ error: exception.message })
+      return res.status(401).json({ error: exception.message })
     } else {
-      console.log(exception)
-      res.status(500).json({ error: 'something went wrong...' })
+      return res.status(500).json({ error: 'something went wrong...' })
     }
   }
 })
@@ -194,7 +217,17 @@ eventRouter.put('/:id', async (req, res) => {
 // Authorized user can delete own event.
 eventRouter.delete('/:id', async (req, res) => {
   try {
+    if(req.params.id.length !==24){
+      return res.status(400).json({ error: 'invalid id' })
+    }
     const event = await Event.findById(req.params.id)
+
+    if(!event){
+      return res.status(404).json({ error: 'wrong id' })
+    }
+    if (event.creator.id !== res.locals.user.id){
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
 
     if (event.dives.length > 0) {
       res.status(401).json({ error: 'delete dives first' })
@@ -204,7 +237,8 @@ eventRouter.delete('/:id', async (req, res) => {
 
     res.status(204).end()
   } catch (exception) {
-    res.status(400).send({ error: 'malformatted id' })
+    console.log(exception.name)
+    res.status(500).send({ error: exception.message })
   }
 })
 

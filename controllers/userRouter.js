@@ -46,8 +46,12 @@ userRouter.post('/', async (req, res) => {
     res.json(User.format(savedUser))
 
   } catch (exception) {
-    console.log(exception)
-    res.status(500).json({ error: 'something went wrong...' })
+    console.log(exception._message)
+    if (exception.message.includes('User validation failed')){
+      res.status(400).json({ error: 'username not unique' })
+    } else {
+      res.status(500).json({ error: 'something went wrong...' })
+    }
   }
 })
 

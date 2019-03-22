@@ -13,6 +13,11 @@ const userObject = {
   'password': '123123salasana'
 }
 
+const userObject2 = {
+  'username': 'SepiSukeltaja',
+  'password': '123123salasana'
+}
+
 const eventObjects = [
   {
     'title': 'Suomen vanhin hylky, huono sää.',
@@ -40,6 +45,12 @@ const postUser = async () => {
     .post(`${config.apiUrl}/users`)
     .send(userObject)
     .expect(200)
+
+  await api
+    .post(`${config.apiUrl}/users`)
+    .send(userObject2)
+    .expect(200)
+
 }
 
 const login = async () => {
@@ -47,6 +58,19 @@ const login = async () => {
 
   await api
     .post(`${config.apiUrl}/login`)
+    .send(userObject)
+    .expect(200)
+    .then(res => {
+      token = res.body.token
+    })
+
+  return token
+}
+const boLogin = async () => {
+  let token
+
+  await api
+    .post(`${config.apiUrl}/login/bo`)
     .send(userObject)
     .expect(200)
     .then(res => {
@@ -116,4 +140,4 @@ const initializeDb = async () => {
 
 }
 
-module.exports = { initializeDb, login }
+module.exports = { initializeDb, login, boLogin }

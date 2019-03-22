@@ -1,16 +1,13 @@
 const diveRouter = require('express').Router()
 const Dive = require('../models/dive')
-const requireAuthentication = require('../middleware/authenticate')
+const { requireAuthentication } = require('../middleware/authenticate')
 const Event = require('../models/event')
-const handleEndDate = require('../middleware/dates')
 
 // This will be removed later
 diveRouter.get('/unauth', async (req, res) => {
   try {
     const dives = await Dive
       .find({})
-      .populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
 
     res.json(dives.map(Dive.format))
   } catch (exception) {
@@ -29,8 +26,6 @@ diveRouter.get('/', async (req, res) => {
     const dives = await Dive
       .find({})
       .where('user').equals(res.locals.user.id)
-      .populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
 
     res.json(dives.map(Dive.format))
   } catch (exception) {
@@ -52,7 +47,7 @@ diveRouter.post('/', async (req, res) => {
 
     const dive = new Dive({
       startdate: startdate || new Date(),
-      enddate: handleEndDate(startdate || new Date(), enddate),
+      enddate: enddate,
       event: event,
       user: user.id,
       latitude,
@@ -68,7 +63,7 @@ diveRouter.post('/', async (req, res) => {
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
-    console.log(savedDive)
+
     res.json(Dive.format(savedDive))
 
   } catch (exception) {
@@ -98,9 +93,8 @@ diveRouter.put('/:id', async (req, res) => {
     }
 
     const dive = await Dive.findById(req.params.id)
-      .populate('user', 'username')
 
-    if (dive.user.id !== res.locals.user.id) {
+    if (!dive.user.equals(res.locals.user.id)) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -108,8 +102,7 @@ diveRouter.put('/:id', async (req, res) => {
       req.params.id,
       { startdate, enddate, event, latitude, longitude },
       { new: true }
-    ).populate('user', 'username')
-      .populate('event', { title: 1, description: 1 })
+    )
 
     res.json(Dive.format(updatedDive))
 
