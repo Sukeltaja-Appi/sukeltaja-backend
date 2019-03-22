@@ -4,8 +4,11 @@ const { app } = require('../index')
 const { userEqualsUser } = require('../utils/userHandler')
 const http = require('http')
 const server = http.createServer(app)
+<<<<<<< HEAD
 
 let connections = []
+=======
+>>>>>>> ed3e0980b6765e11b4b101842a8d379ee4e5f318
 
 server.on('start', () => {
   console.log('emitter started!')
