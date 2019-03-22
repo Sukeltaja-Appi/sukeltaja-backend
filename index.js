@@ -47,7 +47,7 @@ app.use(`${config.apiUrl}/dives`, diveRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 
-app.get('/api/push', subscribe)
+app.get(`${config.apiUrl}/push`, subscribe)
 
 app.listen(5001, () => {
   console.log('Listening on', 5001)

@@ -1,7 +1,8 @@
 const Event = require('../models/event')
 const Message = require('../models/message')
 //const User = require('../models/user')
-const emitter = require('events').EventEmitter()
+const EventEmitter = require('events').EventEmitter
+const emitter = new EventEmitter()
 const { userEqualsUser } = require('../utils/userHandler')
 
 emitter.on('start', () => {
@@ -49,6 +50,33 @@ emitter.on('newMessage', (message) => {
 
 const subscribe = (req, res) => {
   // Still needs to be implemented!
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive'
+  })
+
+  // Heartbeat
+  const nln = function() {
+    res.write('\n')
+  }
+  const hbt = setInterval(nln, 15000)
+
+  const onEvent = function(data) {
+    res.write('retry: 500\n')
+    res.write('event: event\n')
+    res.write(`data: ${JSON.stringify(data)}\n\n`)
+  }
+
+  emitter.on('event', onEvent)
+
+  // Clear heartbeat and listener
+  req.on('close', function() {
+    clearInterval(hbt)
+    emitter.removeListener('event', onEvent)
+  })
+
   console.log('subscribe called: ', req, res)
 }
 
