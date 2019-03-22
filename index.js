@@ -14,6 +14,8 @@ const diveRouter = require('./controllers/diveRouter')
 const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
 
+const { subscribe } = require('./controllers/emitter')
+
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
@@ -44,6 +46,12 @@ app.use(`${config.apiUrl}/targets`, targetRouter)
 app.use(`${config.apiUrl}/dives`, diveRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
+
+app.get('/api/push', subscribe)
+
+app.listen(5001, () => {
+  console.log('Listening on', 5001)
+})
 
 const server = http.createServer(app)
 
