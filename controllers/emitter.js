@@ -1,17 +1,11 @@
 const Event = require('../models/event')
 const Message = require('../models/message')
-//const User = require('../models/user')
-//const EventEmitter = require('events').EventEmitter
 const { app } = require('../index')
 const { userEqualsUser } = require('../utils/userHandler')
 const http = require('http')
 const server = http.createServer(app)
-/*
-server.listen(config.port, () => {
-  console.log(`Server running on port ${config.port}`)
-  console.log(`API root starts at ${config.apiUrl}`)
-})
-*/
+
+let connections = []
 
 server.on('start', () => {
   console.log('emitter started!')
@@ -48,17 +42,22 @@ server.on('updatedEvent', (eventID, senderID) => {
 
 // Sends a new message to all receivers.
 server.on('newMessage', (message) => {
-  /*
+
   for (let i = 0; i < message.receivers.length; i++) {
     send(message.receivers[i], 'newMessage', Message.format(message))
   }
-  */
 
   console.log('newMessage emitted!', message)
 })
 
 const subscribe = (req, res) => {
   // Still needs to be implemented!
+
+  connections[connections.length] = {
+    userID: res.locals.user._id,
+    res,
+    req
+  }
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -72,18 +71,10 @@ const subscribe = (req, res) => {
   }
   const hbt = setInterval(nln, 15000)
 
-  const onEvent = function(data) {
-    res.write('retry: 500\n')
-    res.write('event: event\n')
-    res.write(`data: ${JSON.stringify(data)}\n\n`)
-  }
-
-  emitter.on('event', onEvent)
-
   // Clear heartbeat and listener
-  req.on('close', function() {
+  req.on('closeServer', function() {
     clearInterval(hbt)
-    emitter.removeListener('event', onEvent)
+    server.removeAllListeners()
   })
 
   console.log('subscribe called: ', req, res)
