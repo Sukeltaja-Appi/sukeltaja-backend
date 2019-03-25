@@ -22,7 +22,8 @@
     "luxon": "^1.11.1",
     "mongoose": "^5.4.6",
     "mongoose-autopopulate": "^0.9.1",
-    "mongoose-unique-validator": "^2.0.2"
+    "mongoose-unique-validator": "^2.0.2",
+    "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",

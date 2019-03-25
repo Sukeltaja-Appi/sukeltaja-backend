@@ -14,8 +14,6 @@ const diveRouter = require('./controllers/diveRouter')
 const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
 
-const { subscribe } = require('./controllers/emitter')
-
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
@@ -47,8 +45,6 @@ app.use(`${config.apiUrl}/dives`, diveRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 
-app.get(`${config.apiUrl}/push`, subscribe)
-
 const server = http.createServer(app)
 
 server.listen(config.port, () => {
@@ -60,6 +56,8 @@ server.on('close', () => {
   mongoose.connection.close()
 })
 
+const io = require('./controllers/webSocketController')
+
 module.exports = {
-  app, server
+  app, server, io
 }
