@@ -15,6 +15,12 @@ server.on('start', () => {
 const send = (user, type, data) => {
   // This still needs to be implemented.
   console.log('sending: ', type, data, 'to user:', user)
+
+  const connection = connections.find(c => c.userID === user._id)
+
+  if (connection) {
+    connection.res.json(data)
+  }
 }
 
 // Send data to user if they are not the sender.
@@ -53,11 +59,17 @@ server.on('newMessage', (message) => {
 const subscribe = (req, res) => {
   // Still needs to be implemented!
 
-  connections[connections.length] = {
+  const index = connections.map(c => c.userID).indexOf(res.locals.user._id)
+
+  const connection = {
     userID: res.locals.user._id,
     res,
     req
   }
+
+  // Still need to check and remove inactive connections.
+  if (index !== -1) connections[index] = connection
+  else connections[connections.length] = connection
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
