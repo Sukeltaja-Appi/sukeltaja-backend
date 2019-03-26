@@ -112,8 +112,8 @@ const sendIfNotSender = (user, senderID, type, data) => {
 }
 
 // Sends updated event to all participants.
-io.on('updatedEvent', (eventID, senderID) => {
-  const event = new Event.findByID(eventID)
+io.updateEvent = async (eventID, senderID) => {
+  const event = await Event.findByID(eventID)
 
   sendIfNotSender(event.creator, senderID, 'updatedEvent', event)
 
@@ -123,19 +123,14 @@ io.on('updatedEvent', (eventID, senderID) => {
   for (let i = 0; i < event.participants.length; i++) {
     sendIfNotSender(event.participants[i], senderID, 'updatedEvent', event)
   }
-
-  console.log('updated event emitted!', event)
-})
+}
 
 // Sends a new message to all receivers.
-io.on('newMessage', (message) => {
-
+io.newMessage = (message) => {
   for (let i = 0; i < message.receivers.length; i++) {
     send(message.receivers[i], 'newMessage', Message.format(message))
   }
-
-  console.log('newMessage emitted!', message)
-})
+}
 
 // Is used in controllers to trigger logic 'events'
 module.exports = {

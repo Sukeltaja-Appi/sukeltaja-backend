@@ -56,8 +56,6 @@ server.on('close', () => {
   mongoose.connection.close()
 })
 
-const io = require('./controllers/webSocketController')
-
 module.exports = {
-  app, server, io
+  app, server
 }
