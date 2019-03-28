@@ -84,7 +84,7 @@ const getTokenFromSocket = (data) => {
   return null
 }
 
-const socketAuthentication = async (socket, data) => {
+const socketAuthentication = async (data) => {
   const token = getTokenFromSocket(data)
 
   let decodedToken = null
@@ -109,6 +109,8 @@ const socketAuthentication = async (socket, data) => {
 
     return
   }
+
+  console.log('decoded token:', decodedToken)
 
   return decodedToken.id
 }

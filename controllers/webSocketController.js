@@ -1,10 +1,8 @@
 const Event = require('../models/event')
 const Message = require('../models/message')
-const { userEqualsUser } = require('../utils/userHandler')
-// const { io } = require('../index')
+const User = require('../models/user')
 const http = require('http')
 const { app } = require('../index')
-//const bcrypt = require('bcrypt')
 
 const { socketAuthentication } = require('../middleware/authenticate')
 
@@ -18,13 +16,6 @@ const io = require('socket.io')(socketServer)
 const socketPort = 7821
 
 io.listen(socketPort)
-
-// io.on('connection', (socket) => {
-//   console.log('connected')
-//   console.log(socket)
-// })
-//
-// io.on('disconnect', () => {console.log('disconnected')})
 
 // const io = require('socket.io')(server, {
 //   path: '/push',
@@ -42,25 +33,28 @@ io.on('connection', async (socket) => {
   await socket.on('authentication', async (data) => {
     console.log('authentication data: ', data)
     userID = await socketAuthentication(data)
-    if(userID === 'unauthorized') {
-      socket.emit(userID)
 
-      return userID
+    if(userID === 'unauthorized') {
+      socket.emit('unauthorized')
+      console.log('unauthorized')
+
+      return
     }
+
+    const index = connections.map(c => c.userID).indexOf(userID)
+
+    const connection = {
+      userID,
+      socket,
+    }
+
+    // Still need to check and remove inactive connections.
+    if (index !== -1) connections[index] = connection
+    else connections[connections.length] = connection
+
+    console.log('user:', userID, 'connected to the server!')
   })
 
-  const index = connections.map(c => c.userID).indexOf(userID)
-
-  const connection = {
-    userID,
-    socket,
-  }
-
-  // Still need to check and remove inactive connections.
-  if (index !== -1) connections[index] = connection
-  else connections[connections.length] = connection
-
-  console.log('user:', userID, 'connected to the server!')
 })
 
 io.on('disconnect', userID => {
@@ -71,27 +65,10 @@ io.on('disconnect', userID => {
   console.log('user:', userID, 'disconnected from the server.')
 })
 
-// This must be imported from somewhere not hardcoded like this(Also change value):
-// const conversionKey = '412EAAA9-B925–17DA-31CD-F2AC0C6D5B31'
-//
-// // Still needs to be implemented use 'crypt' module if
-// // bcrypt isint proper for this job.
-// const generateAcceptValue = (acceptKey) => {
-//   return bcrypt
-//     .createHash('sha1')
-//     .update(acceptKey + conversionKey, 'binary')
-//     .digest('base64')
-// }
-
 // Send data to user.
 const send = (user, type, data) => {
-  // This still needs to be implemented.
-  console.log('sending: ', type, data, 'to user:', user)
 
-  const connection = connections.find(c => c.userID === user._id)
-
-  console.log('connections:', connections)
-  console.log('connection', connection)
+  const connection = connections.find(c => String(user) === String(c.userID))
 
   if (connection) {
     try {
@@ -106,33 +83,40 @@ const send = (user, type, data) => {
 
 // Send data to user if they are not the sender.
 const sendIfNotSender = (user, senderID, type, data) => {
-  if(!userEqualsUser(user, senderID)) {
+  if(String(user) === String(senderID)) {
     send(user, type, data)
   }
 }
 
 // Sends updated event to all participants.
 io.updateEvent = async (eventID, senderID) => {
-  const event = await Event.findByID(eventID)
+  let event = await Event.findById(eventID)
 
-  sendIfNotSender(event.creator, senderID, 'updatedEvent', event)
+  event = Event.format(event)
+
+  sendIfNotSender(event.creator._id, senderID, 'updatedEvent', event)
 
   for (let i = 0; i < event.admins.length; i++) {
-    sendIfNotSender(event.admins[i], senderID, 'updatedEvent', event)
+    sendIfNotSender(event.admins[i]._id, senderID, 'updatedEvent', event)
   }
   for (let i = 0; i < event.participants.length; i++) {
-    sendIfNotSender(event.participants[i], senderID, 'updatedEvent', event)
+    sendIfNotSender(event.participants[i]._id, senderID, 'updatedEvent', event)
   }
 }
 
 // Sends a new message to all receivers.
-io.newMessage = (message) => {
-  for (let i = 0; i < message.receivers.length; i++) {
-    send(message.receivers[i], 'newMessage', Message.format(message))
+io.newMessage = async (message) => {
+  const msg = Message.format(message)
+
+  const sender = await User.findById(String(msg.sender))
+
+  msg.sender = { username: sender.username, _id: sender._id }
+
+  for (let i = 0; i < msg.receivers.length; i++) {
+    send(msg.receivers[i], 'newMessage', msg)
   }
 }
 
-// Is used in controllers to trigger logic 'events'
 module.exports = {
   io
 }
