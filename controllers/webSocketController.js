@@ -6,8 +6,6 @@ const { app } = require('../index')
 
 const { socketAuthentication } = require('../middleware/authenticate')
 
-console.log('webSocketController running!!!!!')
-
 let connections = []
 
 const socketServer = http.createServer(app)

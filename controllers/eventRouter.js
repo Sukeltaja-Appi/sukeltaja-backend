@@ -139,7 +139,11 @@ eventRouter.put('/:id/add', async (req, res) => {
     }
 
     let { admins, pending, participants } = event
-    const invite = pending.find(invite => invite.user.equals(user._id))
+
+    const invites = pending.filter(invite => invite.user.equals(user._id))
+    let invite = invites.find(invite => invite.access === 'admin')
+
+    if(!invite) invite = invites.find(invite => invite.access === 'participant')
 
     if (!invite) {
       return res.status(401).json({ error: 'unauthorized request' })
