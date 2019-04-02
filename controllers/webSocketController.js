@@ -9,20 +9,18 @@ const { socketAuthentication } = require('../middleware/authenticate')
 let connections = []
 
 const socketServer = http.createServer(app)
-const io = require('socket.io')(socketServer)
+
+// Socket connection options:   (check socket.io server API for more)
+const io = require('socket.io')(socketServer, {
+  path: '/update',
+  serveClient: true,
+  pingInterval: 25000,
+  pingTimeout: 5000,
+})
 
 const socketPort = 7821
 
 io.listen(socketPort)
-
-// const io = require('socket.io')(server, {
-//   path: '/push',
-//   serveClient: true,
-//   // below are engine.IO options
-//   pingInterval: 10000,
-//   pingTimeout: 5000,
-//   cookie: false
-// })
 
 // Edit to use token.
 io.on('connection', async (socket) => {
@@ -81,7 +79,7 @@ const send = (user, type, data) => {
 
 // Send data to user if they are not the sender.
 const sendIfNotSender = (user, senderID, type, data) => {
-  if(String(user) === String(senderID)) {
+  if(String(user) !== String(senderID)) {
     send(user, type, data)
   }
 }
