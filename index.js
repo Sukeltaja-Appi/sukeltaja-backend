@@ -13,6 +13,7 @@ const targetRouter = require('./controllers/targetRouter')
 const diveRouter = require('./controllers/diveRouter')
 const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
+const pwResetRouter = require('./controllers/passwordResetRouter')
 
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
@@ -28,6 +29,7 @@ mongoose
   })
 
 app.use(cors())
+app.use(express.urlencoded())
 app.use(bodyParser.json())
 
 app.use(express.static('build'))
@@ -44,6 +46,7 @@ app.use(`${config.apiUrl}/targets`, targetRouter)
 app.use(`${config.apiUrl}/dives`, diveRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
+app.use(`${config.apiUrl}/reset`, pwResetRouter)
 
 const server = http.createServer(app)
 

@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
   password: String,
   events: [{ type: ObjectId, ref: 'Event' }],
   dives: [{ type: ObjectId, ref: 'Dive' }],
-  messages: [{ type: ObjectId, ref: 'Message' }]
+  messages: [{ type: ObjectId, ref: 'Message' }],
+  email: String
 })
 
 userSchema.plugin(uniqueValidator)
