@@ -1,9 +1,9 @@
-POST http://localhost:3001/users
+POST http://localhost:3001/api/users
 content-type: application/json
 
 {
     "_id": "",
-    "username": "KalleKapteeni",
+    "username": "UusiTestaaja",
     "password": "123123salasana",
     "events": [],
     "__v": 0

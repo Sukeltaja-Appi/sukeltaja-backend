@@ -5,8 +5,10 @@ if (process.env.NODE_ENV !== 'production') {
 let port = process.env.PORT
 let mongoUrl = process.env.MONGODB_URI
 let kyppiUrl = process.env.KYPPI_URL
-
 let apiUrl = process.env.API_URL
+
+let email = process.env.SERVICE_EMAIL
+let emailPW = process.env.SERVICE_EMAIL_PASSWORD
 
 if (process.env.NODE_ENV === 'test') {
   port = process.env.TEST_PORT
@@ -17,5 +19,7 @@ module.exports = {
   apiUrl,
   kyppiUrl,
   mongoUrl,
-  port
+  port,
+  email,
+  emailPW
 }

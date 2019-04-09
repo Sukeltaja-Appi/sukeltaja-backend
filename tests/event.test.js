@@ -3,14 +3,15 @@ const { app, server } = require('../index')
 const { io } = require('../controllers/webSocketController')
 const api = supertest(app)
 const config = require('../utils/config')
-const { eventsInDb, initializeDb, login } = require('./helpers/testHelper')
+const { eventsInDb, initializeDb, login, getIdFromUsername } = require('./helpers/testHelper')
 const { initialEvents, initialUsers } = require('./helpers/initialData')
 
-let token, eventsAtStart, anothersEvent, nonExistingEventId
+let token, eventsAtStart, anothersEvent, nonExistingEventId, SamiSukeltajaId
 
 beforeAll(async () => {
   await initializeDb()
   token = await login(initialUsers.SamiSukeltaja)
+  SamiSukeltajaId = await getIdFromUsername('SamiSukeltaja')
 }, 30000)
 
 beforeEach(async () => {
@@ -352,6 +353,7 @@ describe('more complex event tests', async () => {
 
       'startdate': '2019-03-15T13:03:22.014Z',
       'enddate': '2019-03-15T14:12:25.128Z',
+      'user': `${SamiSukeltajaId}`,
       'event': `${event._id}`,
       'longitude': '60.5525',
       'latitude': '24.1232',

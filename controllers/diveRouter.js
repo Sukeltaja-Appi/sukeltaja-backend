@@ -1,6 +1,8 @@
 const diveRouter = require('express').Router()
 const Dive = require('../models/dive')
+const User = require('../models/user')
 const { requireAuthentication } = require('../middleware/authenticate')
+const { userIsInArray } = require('../utils/userHandler')
 const Event = require('../models/event')
 
 // This will be removed later
@@ -39,17 +41,28 @@ diveRouter.get('/', async (req, res) => {
 diveRouter.post('/', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
-    const { user } = res.locals
+    const diveUser = req.body.user
+    var { user } = res.locals
 
-    if (!event || !longitude || !latitude || !startdate) {
+    if (!diveUser || !event || !longitude || !latitude || !startdate) {
       return res.status(400).json({ error: 'missing fields' })
+    }
+    if (!user._id.equals(diveUser)) {
+      const fetchedEvent = await Event.findById(event)
+
+      if (fetchedEvent.creator._id.equals(user._id)
+        || userIsInArray(user._id, fetchedEvent.admins)) {
+        user = await User.findById(diveUser)
+      } else {
+        return res.status(401).json({ error: 'unauthorized request' })
+      }
     }
 
     const dive = new Dive({
       startdate: startdate || new Date(),
       enddate: enddate,
       event: event,
-      user: user.id,
+      user: user._id,
       latitude,
       longitude
     })
@@ -91,11 +104,21 @@ diveRouter.put('/:id', async (req, res) => {
     if (!startdate || !enddate || !event || !latitude || !longitude) {
       return res.status(400).json({ error: 'missing fields' })
     }
-
     const dive = await Dive.findById(req.params.id)
+    const diveUser = dive.user
+    var { user } = res.locals
 
-    if (!dive.user.equals(res.locals.user.id)) {
-      return res.status(401).json({ error: 'unauthorized request' })
+    if (!event || !longitude || !latitude || !startdate) {
+      return res.status(400).json({ error: 'missing fields' })
+    }
+
+    if (!user._id.equals(diveUser._id)) {
+      const fetchedEvent = await Event.findById(event)
+
+      if (!fetchedEvent.creator._id.equals(user._id)
+        && !userIsInArray(user._id, fetchedEvent.admins)) {
+        return res.status(401).json({ error: 'unauthorized request' })
+      }
     }
 
     const updatedDive = await Dive.findByIdAndUpdate(

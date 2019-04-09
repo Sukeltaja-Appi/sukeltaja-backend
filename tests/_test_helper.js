@@ -103,12 +103,14 @@ const postTargets = async (token) => {
     .expect(200)
 }
 
-const postDive = async (event, token) => {
+const postDive = async (user, event, token) => {
+  console.log('Posting dive with: ' + user._id)
   const diveObject = {
 
     'startdate': '2019-01-15T13:03:22.014Z',
     'enddate': '2019-01-15T14:12:25.128Z',
     'event': `${event._id}`,
+    'user': `${user._id}`,
     'longitude': '60.5525',
     'latitude': '24.1232',
     '__v': 0
@@ -133,10 +135,13 @@ const initializeDb = async () => {
   const token = await login()
 
   const event = await postEvents(token)
+  const user = await User.findOne({ username: 'SamiSukeltaja' })
+
+  console.log(user)
 
   await postTargets(token)
 
-  await postDive(event, token)
+  await postDive(user, event, token)
 
 }
 
