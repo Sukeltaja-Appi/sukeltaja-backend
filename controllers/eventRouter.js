@@ -2,6 +2,7 @@ const eventRouter = require('express').Router()
 const Event = require('../models/event')
 const User = require('../models/user')
 const { requireAuthentication, requireBoAuthentication } = require('../middleware/authenticate')
+const { io } = require('./webSocketController')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
@@ -138,7 +139,11 @@ eventRouter.put('/:id/add', async (req, res) => {
     }
 
     let { admins, pending, participants } = event
-    const invite = pending.find(invite => invite.user.equals(user._id))
+
+    const invites = pending.filter(invite => invite.user.equals(user._id))
+    let invite = invites.find(invite => invite.access === 'admin')
+
+    if(!invite) invite = invites.find(invite => invite.access === 'participant')
 
     if (!invite) {
       return res.status(401).json({ error: 'unauthorized request' })
@@ -147,6 +152,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     pending = pending.filter(p => p.user._id !== invite.user._id)
 
     if (invite.access === 'admin') {
+      participants = participants.filter(p => p._id !== invite.user._id)
       admins = event.admins.concat(user._id)
     } else if (invite.access === 'participant') {
       participants = event.participants.concat(user._id)
@@ -164,6 +170,9 @@ eventRouter.put('/:id/add', async (req, res) => {
     await addedUser.save()
 
     res.json(Event.format(updatedEvent))
+
+    io.updateEvent(req.params.id, user._id)
+
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({ error: exception.message })
@@ -191,7 +200,7 @@ eventRouter.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'missing fields' })
     }
 
-    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
+    if (event.creator.id !== res.locals.user.id && !userIsInArray(res.locals.user.id, event.admins)) {
 
       return res.status(401).json({ error: 'unauthorized request' })
     }
@@ -203,6 +212,8 @@ eventRouter.put('/:id', async (req, res) => {
     )
 
     res.json(Event.format(updatedEvent))
+
+    io.updateEvent(req.params.id, res.locals.user._id)
 
   } catch (exception) {
     console.log(exception.name)
