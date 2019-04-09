@@ -51,7 +51,7 @@ diveRouter.post('/', async (req, res) => {
       const fetchedEvent = await Event.findById(event)
 
       if (fetchedEvent.creator._id.equals(user._id)
-        || userIsInArray(user._id, fetchedEvent.admins)) {
+        || userIsInArray(user, fetchedEvent.admins)) {
         user = await User.findById(diveUser)
       } else {
         return res.status(401).json({ error: 'unauthorized request' })
@@ -116,7 +116,7 @@ diveRouter.put('/:id', async (req, res) => {
       const fetchedEvent = await Event.findById(event)
 
       if (!fetchedEvent.creator._id.equals(user._id)
-        && !userIsInArray(user._id, fetchedEvent.admins)) {
+        && !userIsInArray(user, fetchedEvent.admins)) {
         return res.status(401).json({ error: 'unauthorized request' })
       }
     }
