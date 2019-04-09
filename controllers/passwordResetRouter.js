@@ -114,6 +114,8 @@ pwResetRouter.post('/', async (req, res) => {
       else
         console.log(info)
     })
+
+    return res.status(200)
   } catch (exception) {
     console.log(exception._message)
     if (exception.message.includes('User validation failed')) {
