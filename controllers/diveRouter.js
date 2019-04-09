@@ -44,11 +44,9 @@ diveRouter.post('/', async (req, res) => {
     const diveUser = req.body.user
     var { user } = res.locals
 
-    if (!event || !longitude || !latitude || !startdate) {
+    if (!diveUser || !event || !longitude || !latitude || !startdate) {
       return res.status(400).json({ error: 'missing fields' })
     }
-    console.log(user)
-    console.log(diveUser)
     if (!user._id.equals(diveUser)) {
       const fetchedEvent = await Event.findById(event)
 
