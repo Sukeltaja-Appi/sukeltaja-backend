@@ -200,7 +200,7 @@ eventRouter.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'missing fields' })
     }
 
-    if (event.creator.id !== res.locals.user.id && !event.admins.includes(res.locals.user.id)) {
+    if (event.creator.id !== res.locals.user.id && !userIsInArray(res.locals.user.id, event.admins)) {
 
       return res.status(401).json({ error: 'unauthorized request' })
     }
