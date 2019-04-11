@@ -69,10 +69,8 @@ const send = (user, type, data) => {
   if (connection) {
     try {
       connection.socket.emit(type, data)
-      console.log('SENDING EVENT TROUGH SOCKET: ', type)
-      console.log(data)
     } catch (exception) {
-      'sending data through socket failed.'
+      console.log('sending data thourh socket failed')
     }
   }
 }
@@ -84,7 +82,7 @@ const sendIfNotSender = (user, senderID, type, data) => {
   }
 }
 
-// Sends updated event to all participants.
+// Sends updated event to all participants except for the sender.
 io.updateEvent = async (eventID, senderID) => {
   let event = await Event.findById(eventID)
 
@@ -97,6 +95,22 @@ io.updateEvent = async (eventID, senderID) => {
   }
   for (let i = 0; i < event.participants.length; i++) {
     sendIfNotSender(event.participants[i]._id, senderID, 'updatedEvent', event)
+  }
+}
+
+// Sends updated event to all participants
+io.updateEventAll = async (eventID) => {
+  let event = await Event.findById(eventID)
+
+  event = Event.format(event)
+
+  send(event.creator._id, 'updatedEvent', event)
+
+  for (let i = 0; i < event.admins.length; i++) {
+    send(event.admins[i]._id, 'updatedEvent', event)
+  }
+  for (let i = 0; i < event.participants.length; i++) {
+    send(event.participants[i]._id, 'updatedEvent', event)
   }
 }
 

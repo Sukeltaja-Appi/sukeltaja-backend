@@ -2,7 +2,9 @@ const diveRouter = require('express').Router()
 const Dive = require('../models/dive')
 const User = require('../models/user')
 const { requireAuthentication } = require('../middleware/authenticate')
+const { io } = require('./webSocketController')
 const { userIsInArray } = require('../utils/userHandler')
+const { sleep } = require('../utils/executionTiming')
 const Event = require('../models/event')
 
 // This will be removed later
@@ -38,6 +40,8 @@ diveRouter.get('/', async (req, res) => {
 
 })
 
+let postTransactionRunning = false
+
 diveRouter.post('/', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
@@ -72,12 +76,22 @@ diveRouter.post('/', async (req, res) => {
     user.dives = user.dives.concat(savedDive.id)
     await user.save()
 
+    // Synchronized block starts. ---------------------
+    while(postTransactionRunning) {
+      await sleep(0.01)
+    }
+    postTransactionRunning = true
+
     const diveEvent = await Event.findById(event)
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
+    postTransactionRunning = false
+    // Synchronized block ends. -----------------------
 
     res.json(Dive.format(savedDive))
+
+    io.updateEventAll(savedDive.event)
 
   } catch (exception) {
     console.log(exception)
@@ -128,6 +142,8 @@ diveRouter.put('/:id', async (req, res) => {
     )
 
     res.json(Dive.format(updatedDive))
+
+    io.updateEventAll(updatedDive.event)
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
