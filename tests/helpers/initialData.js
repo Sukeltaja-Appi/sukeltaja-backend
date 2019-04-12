@@ -7,7 +7,7 @@ const initialUsers = {
   'KalleKalastaja': {
     username: 'KalleKalastaja',
     password: '123123salasana',
-    email: 'eitoimiva@email.com
+    email: 'eitoimiva@email.com'
   }
 }
 
