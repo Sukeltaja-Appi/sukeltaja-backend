@@ -1,11 +1,13 @@
 const initialUsers = {
   'SamiSukeltaja': {
     username: 'SamiSukeltaja',
-    password: '123123salasana'
+    password: '123123salasana',
+    email: 'eitoimiva@email.com'
   },
   'KalleKalastaja': {
     username: 'KalleKalastaja',
-    password: '123123salasana'
+    password: '123123salasana',
+    email: 'eitoimiva@email.com
   }
 }
 
