@@ -48,7 +48,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'MeriMies',
-        password: '123123Salasana'
+        password: '123123Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -74,7 +75,8 @@ describe('User', async () => {
 
       const newUser = {
         username: '',
-        password: '123123Salasana'
+        password: '123123Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -94,7 +96,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'KalleKalastaja',
-        password: '234234Salasana'
+        password: '234234Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -116,7 +119,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'JoukoJäämies',
-        password: ''
+        password: '',
+        email: 'eitoimiva@email.com'
       }
 
       await api
