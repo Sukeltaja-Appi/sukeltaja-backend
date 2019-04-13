@@ -6,6 +6,7 @@ let port = process.env.PORT
 let mongoUrl = process.env.MONGODB_URI
 let kyppiUrl = process.env.KYPPI_URL
 let apiUrl = process.env.API_URL
+let rootUrl = process.env.ROOT_URL
 
 let email = process.env.SERVICE_EMAIL
 let emailPW = process.env.SERVICE_EMAIL_PASSWORD
@@ -21,5 +22,6 @@ module.exports = {
   mongoUrl,
   port,
   email,
-  emailPW
+  emailPW,
+  rootUrl
 }

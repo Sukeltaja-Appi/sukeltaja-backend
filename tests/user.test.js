@@ -26,7 +26,8 @@ describe('User', async () => {
       const usernames = response.body.map(r => r.username)
 
       expect(response.body.length).toBe(2)
-      expect(usernames).toEqual(initialUsernames)
+      expect(usernames).toContain(initialUsernames[0])
+      expect(usernames).toContain(initialUsernames[1])
     })
 
     test('a single user can be returned', async () => {
@@ -40,7 +41,7 @@ describe('User', async () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(response.body.username).toBe(initialUsernames[0])
+      expect(response.body.username).toBe(users[0].username)
     })
 
     test('a new user can be posted', async () => {

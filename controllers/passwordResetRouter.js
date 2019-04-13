@@ -97,7 +97,7 @@ pwResetRouter.post('/', async (req, res) => {
     const createdReset = await reset.save()
 
     console.log(createdReset)
-    const url = `localhost:3001/api/reset/${createdReset._id}`
+    const url = `${config.rootUrl}${config.apiUrl}/reset/${createdReset._id}`
     const mailOptions = {
       from: config.email, // sender address
       to: user.email, // list of receivers
@@ -115,11 +115,11 @@ pwResetRouter.post('/', async (req, res) => {
         console.log(info)
     })
 
-    return res.status(200)
+    return res.status(200).json({ success: 'Email sent' })
   } catch (exception) {
-    console.log(exception._message)
-    if (exception.message.includes('User validation failed')) {
-      res.status(400).json({ error: 'username not unique' })
+    console.log(exception)
+    if (exception.includes('User validation failed')) {
+      return res.status(400).json({ error: 'username not found' })
     } else {
       res.status(500).json({ error: 'something went wrong...' })
     }
