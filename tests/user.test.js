@@ -26,7 +26,8 @@ describe('User', async () => {
       const usernames = response.body.map(r => r.username)
 
       expect(response.body.length).toBe(2)
-      expect(usernames).toEqual(initialUsernames)
+      expect(usernames).toContain(initialUsernames[0])
+      expect(usernames).toContain(initialUsernames[1])
     })
 
     test('a single user can be returned', async () => {
@@ -40,7 +41,7 @@ describe('User', async () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(response.body.username).toBe(initialUsernames[0])
+      expect(response.body.username).toBe(users[0].username)
     })
 
     test('a new user can be posted', async () => {
@@ -48,7 +49,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'MeriMies',
-        password: '123123Salasana'
+        password: '123123Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -74,7 +76,8 @@ describe('User', async () => {
 
       const newUser = {
         username: '',
-        password: '123123Salasana'
+        password: '123123Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -94,7 +97,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'KalleKalastaja',
-        password: '234234Salasana'
+        password: '234234Salasana',
+        email: 'eitoimiva@email.com'
       }
 
       await api
@@ -116,7 +120,8 @@ describe('User', async () => {
 
       const newUser = {
         username: 'JoukoJäämies',
-        password: ''
+        password: '',
+        email: 'eitoimiva@email.com'
       }
 
       await api

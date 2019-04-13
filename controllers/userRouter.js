@@ -27,7 +27,7 @@ userRouter.post('/', async (req, res) => {
   try {
     const body = req.body
 
-    if (!body.username || !body.password) {
+    if (!body.username || !body.password || !body.email) {
       return res.status(400).json({ error: 'username or password missing' })
     }
 
@@ -38,7 +38,8 @@ userRouter.post('/', async (req, res) => {
       username: body.username,
       password: passwordHash,
       events: body.events,
-      dives: body.dives
+      dives: body.dives,
+      email: body.email
     })
 
     const savedUser = await user.save()

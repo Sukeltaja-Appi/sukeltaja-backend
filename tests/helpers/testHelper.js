@@ -25,6 +25,12 @@ const clearDb = async () => {
   await Target.deleteMany({})
   await Dive.deleteMany({})
 }
+const getIdFromUsername = async (givenUsername) => {
+  const user = await User.findOne({ username: `${givenUsername}` })
+
+  return user._id
+
+}
 
 const postUsers = async () => post.data(Object.values(initialUsers)).toUrl('users').exec()
 
@@ -38,6 +44,8 @@ const postTargets = async () => post.data(initialTargets).toUrl('targets').asUse
 
 const mapEventIdsToDives = (events) => initialDives.map((dive, index) => dive.event = `${events[index]._id}`)
 
+const mapUserIdToDives = (user) => initialDives.map((dive) => dive.user = `${user._id}`)
+
 // Main function
 const initializeDb = async () => {
   await clearDb()
@@ -45,13 +53,15 @@ const initializeDb = async () => {
 
   const restOfEvents = await postEvents()
   const lastEvent = await postThirdEventAsKalle()
+  const user = await User.findOne({ username: 'SamiSukeltaja' })
 
   mapEventIdsToDives([...restOfEvents, lastEvent])
+  mapUserIdToDives(user)
 
   await postDives()
   await postTargets()
 }
 
 module.exports = {
-  eventsInDb, initialEvents, initialUsers, initializeDb, nonExistingEventId, usersInDb, login
+  eventsInDb, initialEvents, initialUsers, initializeDb, nonExistingEventId, usersInDb, login, getIdFromUsername
 }

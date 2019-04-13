@@ -16,7 +16,8 @@ const eventSchema = new mongoose.Schema({
     access: String
   }],
   target: { type: ObjectId, ref: 'Target', autopopulate: true },
-  dives: [{ type: ObjectId, ref: 'Dive' }]
+  dives: [{ type: ObjectId, ref: 'Dive', autopopulate: { select:
+     ['user', 'startdate', 'enddate', 'latitude', 'longitude' ] } }]
 })
 
 eventSchema.statics.format = (event) => {
