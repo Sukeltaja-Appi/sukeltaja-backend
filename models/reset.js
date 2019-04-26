@@ -4,8 +4,7 @@ const resetSchema = new mongoose.Schema({
   username: String,
   expireAt: {
     type: Date,
-    default: new Date(new Date().valueOf() + 600000),
-    index: { expires: 600000 },
+    default: () => Date.now() + 600000
   }
 })
 

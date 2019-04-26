@@ -152,7 +152,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     pending = pending.filter(p => p.user._id !== invite.user._id)
 
     if (invite.access === 'admin') {
-      participants = participants.filter(p => p._id !== invite.user._id)
+      participants = participants.filter(p => !p._id.equals(invite.user._id))
       admins = event.admins.concat(user._id)
     } else if (invite.access === 'participant') {
       participants = event.participants.concat(user._id)

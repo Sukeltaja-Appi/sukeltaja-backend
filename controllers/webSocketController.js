@@ -6,6 +6,7 @@ const { app } = require('../index')
 
 const { socketAuthentication } = require('../middleware/authenticate')
 
+// Connection structure: { userID, socket }
 let connections = []
 
 const socketServer = http.createServer(app)
@@ -44,9 +45,20 @@ io.on('connection', async (socket) => {
       socket,
     }
 
-    // Still need to check and remove inactive connections.
     if (index !== -1) connections[index] = connection
-    else connections[connections.length] = connection
+    else {
+      let placed = false
+
+      for(let i=0; i < connections.length; i++){
+        if(connections[i].socket.disconnected) {
+          connections[i] = connection
+          placed = true
+          break
+        }
+      }
+
+      if(!placed) connections[connections.length] = connection
+    }
 
     console.log('user:', userID, 'connected to the server!')
   })

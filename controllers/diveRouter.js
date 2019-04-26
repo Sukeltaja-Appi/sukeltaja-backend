@@ -4,7 +4,7 @@ const User = require('../models/user')
 const { requireAuthentication } = require('../middleware/authenticate')
 const { io } = require('./webSocketController')
 const { userIsInArray } = require('../utils/userHandler')
-const { sleep } = require('../utils/executionTiming')
+const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
 const Event = require('../models/event')
 
 // This will be removed later
@@ -39,8 +39,6 @@ diveRouter.get('/', async (req, res) => {
   }
 
 })
-
-let postTransactionRunning = false
 
 diveRouter.post('/', async (req, res) => {
   try {
@@ -77,16 +75,15 @@ diveRouter.post('/', async (req, res) => {
     await user.save()
 
     // Synchronized block starts. ---------------------
-    while(postTransactionRunning) {
-      await sleep(0.01)
-    }
-    postTransactionRunning = true
+    while(dbObjectsInUse[event]) await sleep(0.01)
+    dbObjectsInUse[event] = true
 
     const diveEvent = await Event.findById(event)
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
-    postTransactionRunning = false
+
+    delete dbObjectsInUse[event]
     // Synchronized block ends. -----------------------
 
     res.json(Dive.format(savedDive))
