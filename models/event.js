@@ -17,11 +17,17 @@ const eventSchema = new mongoose.Schema({
   }],
   target: { type: ObjectId, ref: 'Target', autopopulate: true },
   dives: [{ type: ObjectId, ref: 'Dive', autopopulate: { select:
-     ['user', 'startdate', 'enddate', 'latitude', 'longitude' ] } }]
+     ['user', 'startdate', 'enddate', 'latitude', 'longitude'] } }],
+  eventMessages: [{ type: ObjectId, ref: 'EventMessage', autopopulate: { select:
+     ['user', 'created', 'text'] } }]
 })
 
 eventSchema.statics.format = (event) => {
-  const { _id, title, description, startdate, enddate, creator, admins, participants, pending, target, dives } = event
+  const {
+    _id, title, description, startdate, enddate,
+    creator, admins, participants, pending, target,
+    dives, eventMessages
+  } = event
 
   return {
     _id,
@@ -34,7 +40,8 @@ eventSchema.statics.format = (event) => {
     participants: participants.toObject(),
     pending: pending.toObject(),
     target,
-    dives: dives.toObject()
+    dives: dives.toObject(),
+    eventMessages: eventMessages.toObject()
   }
 }
 

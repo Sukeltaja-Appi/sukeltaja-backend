@@ -7,21 +7,6 @@ const { userIsInArray } = require('../utils/userHandler')
 const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
 const Event = require('../models/event')
 
-// This will be removed later
-diveRouter.get('/unauth', async (req, res) => {
-  try {
-    const dives = await Dive
-      .find({})
-
-    res.json(dives.map(Dive.format))
-  } catch (exception) {
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-
-})
-
 // From here on require authentication on all routes.
 diveRouter.all('*', requireAuthentication)
 
@@ -118,10 +103,6 @@ diveRouter.put('/:id', async (req, res) => {
     const dive = await Dive.findById(req.params.id)
     const diveUser = dive.user
     var { user } = res.locals
-
-    if (!event || !longitude || !latitude || !startdate) {
-      return res.status(400).json({ error: 'missing fields' })
-    }
 
     if (!user._id.equals(diveUser._id)) {
       const fetchedEvent = await Event.findById(event)

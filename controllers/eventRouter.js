@@ -6,19 +6,6 @@ const { io } = require('./webSocketController')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
-eventRouter.get('/unauth', async (req, res) => {
-  try {
-    const events = await Event.find({})
-
-    res.json(events.map(Event.format))
-  } catch (exception) {
-
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
-
 eventRouter.get('/bo', requireBoAuthentication, async (req, res) => {
   try {
     const events = await Event.find({})
@@ -91,7 +78,7 @@ eventRouter.get('/:id', async (req, res) => {
 // Authorized user can post an event.
 eventRouter.post('/', async (req, res) => {
   try {
-    const { title, description, startdate, enddate, dives, target } = req.body
+    const { title, description, startdate, enddate, dives, eventMessages, target } = req.body
     const { user } = res.locals
 
     if (!title) {
@@ -105,6 +92,7 @@ eventRouter.post('/', async (req, res) => {
       enddate: handleEndDate(startdate || new Date(), enddate),
       creator: user.id,
       dives,
+      eventMessages,
       target
     })
 
@@ -186,7 +174,8 @@ eventRouter.put('/:id/add', async (req, res) => {
 // Authorized user can edit own event.
 eventRouter.put('/:id', async (req, res) => {
   try {
-    const { title, description, startdate, enddate, admins, participants, pending, dives, target } = req.body
+    const { title, description, startdate, enddate, admins, participants,
+      pending, dives, target, eventMessages } = req.body
 
     if(req.params.id.length !==24){
       return res.status(400).json({ error: 'invalid id' })
@@ -207,7 +196,7 @@ eventRouter.put('/:id', async (req, res) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
-      { title, description, startdate, enddate, admins, participants, pending, dives, target },
+      { title, description, startdate, enddate, admins, participants, pending, dives, eventMessages, target },
       { new: true }
     )
 
@@ -240,6 +229,7 @@ eventRouter.delete('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
+    // Delete this check?
     if (event.dives.length > 0) {
       res.status(401).json({ error: 'delete dives first' })
     }
