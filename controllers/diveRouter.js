@@ -85,8 +85,12 @@ diveRouter.post('/', async (req, res) => {
 diveRouter.delete('/:id', async (req, res) => {
   try {
 
+    const dive = await Dive.findById(req.params.id)
+    const eventID = dive.event
+
     await Dive.findByIdAndRemove(req.params.id)
 
+    io.updateEventAll(eventID)
     res.status(204).end()
   } catch (exception) {
     res.status(400).send({ error: 'malformatted id' })
