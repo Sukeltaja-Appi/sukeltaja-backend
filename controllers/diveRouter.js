@@ -31,7 +31,7 @@ diveRouter.post('/', async (req, res) => {
     const diveUser = req.body.user
     var { user } = res.locals
 
-    if (!diveUser || !event || !longitude || !latitude || !startdate) {
+    if (!diveUser || !event || !startdate) {
       return res.status(400).json({ error: 'missing fields' })
     }
     if (!user._id.equals(diveUser)) {
@@ -109,7 +109,7 @@ diveRouter.put('/:id', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
 
-    if (!startdate || !enddate || !event || !latitude || !longitude) {
+    if (!startdate || !enddate || !event) {
       return res.status(400).json({ error: 'missing fields' })
     }
     const dive = await Dive.findById(req.params.id)
