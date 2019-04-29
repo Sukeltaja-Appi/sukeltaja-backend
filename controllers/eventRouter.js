@@ -36,9 +36,15 @@ eventRouter.get('/', async (req, res) => {
 
     const user = await User.findById(res.locals.user.id)
 
-    events.filter(e => user.events.includes(e._id))
+    const filteredEvents = []
 
-    res.json(events.map(Event.format))
+    events.forEach(e => {
+      user.events.forEach(usersEvent => {
+        if(e._id.equals(usersEvent._id)) filteredEvents.push(e)
+      })
+    })
+
+    res.json(filteredEvents.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -220,7 +226,7 @@ eventRouter.put('/:id', async (req, res) => {
 
 eventRouter.delete('/reference/:id', async (req, res) => {
   try {
-    const user = User.findById(res.locals.user._id)
+    const user = await User.findById(res.locals.user.id)
 
     user.events = user.events.filter(e => !e._id.equals(req.params.id))
     user.save()

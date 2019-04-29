@@ -76,6 +76,14 @@ diveRouter.post('/', async (req, res) => {
     io.updateEventAll(savedDive.event)
 
   } catch (exception) {
+    // semaphore reset starts---------------------
+    try {
+      const { event } = req.body
+
+      delete dbObjectsInUse[event]
+    } catch(e) {console.log(e)}
+    // semaphore reset ends. ---------------------
+
     console.log(exception)
 
     return res.status(500).json({ error: 'something went wrong...' })
