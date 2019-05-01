@@ -29,16 +29,6 @@ mongoose
     console.log(err)
   })
 
-// Redirect from http to https @ heroku
-app.all('*', (req, res, next) => {
-  if(!req.secure){
-    if(req.headers.host.includes('heroku')){
-      console.log('Redirecting secure connection')
-      res.redirect(config.rootUrl + req.path)
-    }
-  }
-  next()
-})
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json())
