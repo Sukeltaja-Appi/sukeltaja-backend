@@ -17,6 +17,28 @@ userRouter.get('/', async (req, res) => {
   }
 })
 
+userRouter.get('/names', async (req, res) => {
+  try {
+    const users = await User
+      .find({})
+
+    const formattedUsers = []
+
+    users.forEach(u => {
+      formattedUsers.push({
+        _id: u._id,
+        username: u.username
+      })
+    })
+
+    res.json(formattedUsers)
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
 userRouter.get('/:id', async (req, res) => {
   const user = await User.findById(req.params.id)
 

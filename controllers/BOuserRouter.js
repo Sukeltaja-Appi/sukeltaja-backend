@@ -8,7 +8,8 @@ BOuserRouter.all('*', requireBoAuthentication)
 
 BOuserRouter.get('/', async (req, res) => {
   try {
-    if (!res.locals.admin) {
+    console.log(res.locals.user.admin)
+    if (!res.locals.user.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
@@ -23,9 +24,40 @@ BOuserRouter.get('/', async (req, res) => {
   }
 })
 
+BOuserRouter.put('/', async (req, res) => {
+  try{
+    const bouser = await BOUser.findOne({ username: req.body.username })
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
+
+    if(res.locals.user.admin){
+      await BOUser.findByIdAndUpdate(
+        bouser._id,
+        { password: passwordHash, admin: req.body.admin },
+        { new: true }
+      )
+    }
+    else {
+      if(!bouser._id.equals(res.locals.user.id)){
+        return res.status(401).json({ error: 'unauthorized request' })
+      }
+      await BOUser.findByIdAndUpdate(
+        bouser._id,
+        { password: passwordHash },
+        { new: true }
+      )
+      res.status(204).end()
+    }
+  } catch (exception) {
+    console.log(exception)
+
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+})
+
 BOuserRouter.post('/', async (req, res) => {
   try {
-    if (res.locals.admin) {
+    if (!res.locals.user.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
     }
     const body = req.body

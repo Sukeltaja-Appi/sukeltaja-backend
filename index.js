@@ -11,6 +11,7 @@ const userRouter = require('./controllers/userRouter')
 const loginRouter = require('./controllers/loginRouter')
 const targetRouter = require('./controllers/targetRouter')
 const diveRouter = require('./controllers/diveRouter')
+const eventMessageRouter = require('./controllers/eventMessageRouter')
 const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
 const pwResetRouter = require('./controllers/passwordResetRouter')
@@ -28,6 +29,16 @@ mongoose
     console.log(err)
   })
 
+// Redirect from http to https @ heroku
+app.all('*', (req, res, next) => {
+  if(!req.secure){
+    if(req.headers.host.includes('heroku')){
+      console.log('Redirecting secure connection')
+      res.redirect(req.headers.host + req.path)
+    }
+  }
+  next()
+})
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -44,6 +55,7 @@ app.use(`${config.apiUrl}/users`, userRouter)
 app.use(`${config.apiUrl}/login`, loginRouter)
 app.use(`${config.apiUrl}/targets`, targetRouter)
 app.use(`${config.apiUrl}/dives`, diveRouter)
+app.use(`${config.apiUrl}/eventMessages`, eventMessageRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 app.use(`${config.apiUrl}/reset`, pwResetRouter)

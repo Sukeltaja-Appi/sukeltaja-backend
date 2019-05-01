@@ -4,23 +4,8 @@ const User = require('../models/user')
 const { requireAuthentication } = require('../middleware/authenticate')
 const { io } = require('./webSocketController')
 const { userIsInArray } = require('../utils/userHandler')
-const { sleep } = require('../utils/executionTiming')
+const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
 const Event = require('../models/event')
-
-// This will be removed later
-diveRouter.get('/unauth', async (req, res) => {
-  try {
-    const dives = await Dive
-      .find({})
-
-    res.json(dives.map(Dive.format))
-  } catch (exception) {
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-
-})
 
 // From here on require authentication on all routes.
 diveRouter.all('*', requireAuthentication)
@@ -40,15 +25,13 @@ diveRouter.get('/', async (req, res) => {
 
 })
 
-let postTransactionRunning = false
-
 diveRouter.post('/', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
     const diveUser = req.body.user
     var { user } = res.locals
 
-    if (!diveUser || !event || !longitude || !latitude || !startdate) {
+    if (!diveUser || !event || !startdate) {
       return res.status(400).json({ error: 'missing fields' })
     }
     if (!user._id.equals(diveUser)) {
@@ -77,16 +60,15 @@ diveRouter.post('/', async (req, res) => {
     await user.save()
 
     // Synchronized block starts. ---------------------
-    while(postTransactionRunning) {
-      await sleep(0.01)
-    }
-    postTransactionRunning = true
+    while(dbObjectsInUse[event]) await sleep(0.01)
+    dbObjectsInUse[event] = true
 
     const diveEvent = await Event.findById(event)
 
     diveEvent.dives = diveEvent.dives.concat(savedDive.id)
     await diveEvent.save()
-    postTransactionRunning = false
+
+    delete dbObjectsInUse[event]
     // Synchronized block ends. -----------------------
 
     res.json(Dive.format(savedDive))
@@ -94,6 +76,14 @@ diveRouter.post('/', async (req, res) => {
     io.updateEventAll(savedDive.event)
 
   } catch (exception) {
+    // semaphore reset starts---------------------
+    try {
+      const { event } = req.body
+
+      delete dbObjectsInUse[event]
+    } catch(e) {console.log(e)}
+    // semaphore reset ends. ---------------------
+
     console.log(exception)
 
     return res.status(500).json({ error: 'something went wrong...' })
@@ -103,8 +93,12 @@ diveRouter.post('/', async (req, res) => {
 diveRouter.delete('/:id', async (req, res) => {
   try {
 
+    const dive = await Dive.findById(req.params.id)
+    const eventID = dive.event
+
     await Dive.findByIdAndRemove(req.params.id)
 
+    io.updateEventAll(eventID)
     res.status(204).end()
   } catch (exception) {
     res.status(400).send({ error: 'malformatted id' })
@@ -115,16 +109,12 @@ diveRouter.put('/:id', async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
 
-    if (!startdate || !enddate || !event || !latitude || !longitude) {
+    if (!startdate || !enddate || !event) {
       return res.status(400).json({ error: 'missing fields' })
     }
     const dive = await Dive.findById(req.params.id)
     const diveUser = dive.user
     var { user } = res.locals
-
-    if (!event || !longitude || !latitude || !startdate) {
-      return res.status(400).json({ error: 'missing fields' })
-    }
 
     if (!user._id.equals(diveUser._id)) {
       const fetchedEvent = await Event.findById(event)

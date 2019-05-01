@@ -6,19 +6,6 @@ const { io } = require('./webSocketController')
 const handleEndDate = require('../middleware/dates')
 const { userIsInArray } = require('../utils/userHandler')
 
-eventRouter.get('/unauth', async (req, res) => {
-  try {
-    const events = await Event.find({})
-
-    res.json(events.map(Event.format))
-  } catch (exception) {
-
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
-
 eventRouter.get('/bo', requireBoAuthentication, async (req, res) => {
   try {
     const events = await Event.find({})
@@ -47,7 +34,17 @@ eventRouter.get('/', async (req, res) => {
         ]
       })
 
-    res.json(events.map(Event.format))
+    const user = await User.findById(res.locals.user.id)
+
+    const filteredEvents = []
+
+    events.forEach(e => {
+      user.events.forEach(usersEvent => {
+        if(e._id.equals(usersEvent._id)) filteredEvents.push(e)
+      })
+    })
+
+    res.json(filteredEvents.map(Event.format))
   } catch (exception) {
 
     console.log(exception)
@@ -91,7 +88,7 @@ eventRouter.get('/:id', async (req, res) => {
 // Authorized user can post an event.
 eventRouter.post('/', async (req, res) => {
   try {
-    const { title, description, startdate, enddate, dives, target } = req.body
+    const { title, description, startdate, enddate, dives, eventMessages, target } = req.body
     const { user } = res.locals
 
     if (!title) {
@@ -105,6 +102,7 @@ eventRouter.post('/', async (req, res) => {
       enddate: handleEndDate(startdate || new Date(), enddate),
       creator: user.id,
       dives,
+      eventMessages,
       target
     })
 
@@ -152,7 +150,7 @@ eventRouter.put('/:id/add', async (req, res) => {
     pending = pending.filter(p => p.user._id !== invite.user._id)
 
     if (invite.access === 'admin') {
-      participants = participants.filter(p => p._id !== invite.user._id)
+      participants = participants.filter(p => !p._id.equals(invite.user._id))
       admins = event.admins.concat(user._id)
     } else if (invite.access === 'participant') {
       participants = event.participants.concat(user._id)
@@ -186,7 +184,8 @@ eventRouter.put('/:id/add', async (req, res) => {
 // Authorized user can edit own event.
 eventRouter.put('/:id', async (req, res) => {
   try {
-    const { title, description, startdate, enddate, admins, participants, pending, dives, target } = req.body
+    const { title, description, startdate, enddate, admins, participants,
+      pending, dives, target, eventMessages } = req.body
 
     if(req.params.id.length !==24){
       return res.status(400).json({ error: 'invalid id' })
@@ -207,7 +206,7 @@ eventRouter.put('/:id', async (req, res) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
-      { title, description, startdate, enddate, admins, participants, pending, dives, target },
+      { title, description, startdate, enddate, admins, participants, pending, dives, eventMessages, target },
       { new: true }
     )
 
@@ -222,6 +221,20 @@ eventRouter.put('/:id', async (req, res) => {
     } else {
       return res.status(500).json({ error: 'something went wrong...' })
     }
+  }
+})
+
+eventRouter.delete('/reference/:id', async (req, res) => {
+  try {
+    const user = await User.findById(res.locals.user.id)
+
+    user.events = user.events.filter(e => !e._id.equals(req.params.id))
+    user.save()
+
+    res.status(204).end()
+  } catch (exception) {
+    console.log(exception.name)
+    res.status(500).send({ error: exception.message })
   }
 })
 
@@ -240,6 +253,7 @@ eventRouter.delete('/:id', async (req, res) => {
       return res.status(401).json({ error: 'unauthorized request' })
     }
 
+    // Delete this check?
     if (event.dives.length > 0) {
       res.status(401).json({ error: 'delete dives first' })
     }
