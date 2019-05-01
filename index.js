@@ -34,7 +34,7 @@ app.all('*', (req, res, next) => {
   if(!req.secure){
     if(req.headers.host.includes('heroku')){
       console.log('Redirecting secure connection')
-      res.redirect(req.headers.host + req.path)
+      res.redirect(config.rootUrl + req.path)
     }
   }
   next()
