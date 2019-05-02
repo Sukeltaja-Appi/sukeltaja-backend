@@ -78,7 +78,7 @@ messageRouter.post('/', async (req, res) => {
 
     res.json(Message.format(savedMessage))
 
-    io.newMessage(savedMessage)
+    req.io.newMessage(savedMessage)
 
   } catch (exception) {
     console.log(exception)

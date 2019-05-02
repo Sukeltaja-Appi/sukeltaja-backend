@@ -73,7 +73,7 @@ diveRouter.post('/', async (req, res) => {
 
     res.json(Dive.format(savedDive))
 
-    io.updateEventAll(savedDive.event)
+    req.io.updateEventAll(savedDive.event)
 
   } catch (exception) {
     // semaphore reset starts---------------------
@@ -98,7 +98,7 @@ diveRouter.delete('/:id', async (req, res) => {
 
     await Dive.findByIdAndRemove(req.params.id)
 
-    io.updateEventAll(eventID)
+    req.io.updateEventAll(eventID)
     res.status(204).end()
   } catch (exception) {
     res.status(400).send({ error: 'malformatted id' })
@@ -133,7 +133,7 @@ diveRouter.put('/:id', async (req, res) => {
 
     res.json(Dive.format(updatedDive))
 
-    io.updateEventAll(updatedDive.event)
+    req.io.updateEventAll(updatedDive.event)
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
