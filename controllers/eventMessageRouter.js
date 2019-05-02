@@ -1,7 +1,6 @@
 const eventMessageRouter = require('express').Router()
 const EventMessage = require('../models/eventMessage')
 const { requireAuthentication } = require('../middleware/authenticate')
-const { io } = require('./webSocketController')
 const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
 const Event = require('../models/event')
 
@@ -53,8 +52,7 @@ eventMessageRouter.post('/', async (req, res) => {
     // Synchronized block ends. -----------------------
 
     res.json(EventMessage.format(savedEventMessage))
-
-    io.updateEventAll(savedEventMessage.event)
+    req.io.updateEventAll(savedEventMessage.event)
 
   } catch (exception) {
     // semaphore reset starts---------------------
@@ -105,7 +103,7 @@ eventMessageRouter.put('/:id', async (req, res) => {
 
     res.json(EventMessage.format(updatedEventMessage))
 
-    io.updateEventAll(updatedEventMessage.event)
+    req.io.updateEventAll(updatedEventMessage.event)
 
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {

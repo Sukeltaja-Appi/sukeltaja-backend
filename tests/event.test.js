@@ -1,6 +1,5 @@
 const supertest = require('supertest')
 const { app, server } = require('../index')
-const { io } = require('../controllers/webSocketController')
 const api = supertest(app)
 const config = require('../utils/config')
 const { eventsInDb, initializeDb, login, getIdFromUsername } = require('./helpers/testHelper')
@@ -498,6 +497,5 @@ describe('more complex event tests', async () => {
 
 afterAll(async () => {
   await server.close()
-  await io.close()
   console.log('closed server')
 })

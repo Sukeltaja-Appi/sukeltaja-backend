@@ -1,7 +1,6 @@
 const messageRouter = require('express').Router()
 const Message = require('../models/message')
 const User = require('../models/user')
-const { io } = require('./webSocketController')
 //const bcrypt = require('bcrypt')
 const { messageOkToDelete, handleMessage } = require('./messageController')
 const { requireAuthentication } = require('../middleware/authenticate')
@@ -78,7 +77,7 @@ messageRouter.post('/', async (req, res) => {
 
     res.json(Message.format(savedMessage))
 
-    io.newMessage(savedMessage)
+    req.io.newMessage(savedMessage)
 
   } catch (exception) {
     console.log(exception)
