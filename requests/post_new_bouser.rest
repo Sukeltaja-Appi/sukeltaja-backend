@@ -1,0 +1,11 @@
+PUT http://localhost:3001/api/bousers
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vdGFkbWluIiwiaWQiOiI1YzdlYTA0MzRkNWQyYzM5MDAwZGQxNzgiLCJpYXQiOjE1NTY3MjE5NDl9.MpIPCyhtSQzR8V6_44HONVOkl2-YRMu-4qBC54Bcn6M
+
+{
+    "_id": "",
+    "username": "notadmin",
+    "password": "123admin",
+    "admin" : true,
+    "__v": 0
+}
