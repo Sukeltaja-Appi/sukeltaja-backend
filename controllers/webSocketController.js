@@ -17,7 +17,6 @@ const createIO = (server) => {
     pingTimeout: 5000,
   })
 
-
   // Edit to use token.
   io.on('connection', async (socket) => {
     let userID = null
