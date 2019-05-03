@@ -73,7 +73,7 @@ BOuserRouter.put('/', async (req, res) => {
   }
 })
 
-BOuserRouter.delete('/id:', async (req, res) => {
+BOuserRouter.delete('/:id', async (req, res) => {
   try{
     if (!res.locals.user.admin) {
       return res.status(401).json({ error: 'unauthorized request' })
