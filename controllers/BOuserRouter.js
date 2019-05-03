@@ -24,20 +24,38 @@ BOuserRouter.get('/', async (req, res) => {
 })
 
 BOuserRouter.put('/', async (req, res) => {
-  try{
+  try {
     const bouser = await BOUser.findOne({ username: req.body.username })
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
 
-    if(res.locals.user.admin){
+    if (!bouser) {
+      return res.status(400).json({ error: 'wrong username' })
+    }
+    var passwordHash
+
+    if (req.body.password){
+      const saltRounds = 10
+
+      passwordHash = await bcrypt.hash(req.body.password, saltRounds)
+    } else {
+      passwordHash = bouser.password
+    }
+
+    if (res.locals.user.admin) {
+      var newAdminRole
+
+      if (bouser._id.equals(res.locals.user.id)){
+        newAdminRole = true
+      } else {
+        newAdminRole = req.body.admin
+      }
       await BOUser.findByIdAndUpdate(
         bouser._id,
-        { password: passwordHash, admin: req.body.admin },
+        { password: passwordHash, admin: newAdminRole },
         { new: true }
       )
     }
     else {
-      if(!bouser._id.equals(res.locals.user.id)){
+      if (!bouser._id.equals(res.locals.user.id)) {
         return res.status(401).json({ error: 'unauthorized request' })
       }
       await BOUser.findByIdAndUpdate(
@@ -45,13 +63,38 @@ BOuserRouter.put('/', async (req, res) => {
         { password: passwordHash },
         { new: true }
       )
-      res.status(204).end()
     }
+
+    return res.status(204).end()
   } catch (exception) {
     console.log(exception)
 
     return res.status(500).json({ error: 'something went wrong...' })
   }
+})
+
+BOuserRouter.delete('/id:', async (req, res) => {
+  try{
+    if (!res.locals.user.admin) {
+      return res.status(401).json({ error: 'unauthorized request' })
+    }
+    const bouser = await BOUser.findById(req.params.id)
+
+    if (!bouser){
+      return res.status(400).json({ error: 'wrong id' })
+    }
+    if (bouser.admin){
+      return res.status(401).json({ error: 'unauthorized request, you can not delete another admin' })
+    }
+
+    await BOUser.findByIdAndDelete(req.params.id)
+
+    return res.status(204).end()
+
+  } catch (exception) {
+    return res.status(500).json({ error: 'something went wrong...' })
+  }
+
 })
 
 BOuserRouter.post('/', async (req, res) => {
