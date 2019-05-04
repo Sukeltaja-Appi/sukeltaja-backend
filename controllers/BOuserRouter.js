@@ -104,8 +104,8 @@ BOuserRouter.post('/', async (req, res) => {
     }
     const body = req.body
 
-    if (!body.username || !body.password) {
-      return res.status(400).json({ error: 'user or password missing' })
+    if (!body.username || !body.password || !body.admin) {
+      return res.status(400).json({ error: 'missing fields' })
     }
 
     const saltRounds = 10
@@ -114,7 +114,7 @@ BOuserRouter.post('/', async (req, res) => {
     const BOuser = new BOUser({
       username: body.username,
       password: passwordHash,
-      admin: false
+      admin: body.admin
     })
 
     const savedBOUser = await BOuser.save()
