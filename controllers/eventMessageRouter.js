@@ -72,8 +72,12 @@ eventMessageRouter.post('/', async (req, res) => {
 eventMessageRouter.delete('/:id', async (req, res) => {
   try {
 
+    const eventMessage = await EventMessage.findById(req.params.id)
+    const eventID = eventMessage.event
+
     await EventMessage.findByIdAndRemove(req.params.id)
 
+    req.io.updateEventAll(eventID)
     res.status(204).end()
   } catch (exception) {
     res.status(400).send({ error: 'malformatted id' })
