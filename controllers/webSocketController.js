@@ -17,7 +17,7 @@ const createIO = (server) => {
     pingTimeout: 5000,
   })
 
-  // Edit to use token.
+  // Forms a websocket connection with the client if a valid token is received.
   io.on('connection', async (socket) => {
     let userID = null
 
@@ -32,6 +32,7 @@ const createIO = (server) => {
         return
       }
 
+      // Below code decides where to place the connection in the connections array.
       const index = connections.map(c => c.userID).indexOf(userID)
 
       const connection = {
@@ -43,8 +44,9 @@ const createIO = (server) => {
       else {
         let placed = false
 
+        // Replaces the first disconnected connection.
         for (let i = 0; i < connections.length; i++) {
-          if (connections[i].socket.disconnected) {
+          if (!connections[i].socket || connections[i].socket.disconnected) {
             connections[i] = connection
             placed = true
             break
