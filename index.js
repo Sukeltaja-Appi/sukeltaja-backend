@@ -15,7 +15,6 @@ const eventMessageRouter = require('./controllers/eventMessageRouter')
 const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
 const pwResetRouter = require('./controllers/passwordResetRouter')
-//const io = require('./controllers/webSocketController')
 const { createIO } = require('./controllers/webSocketController')
 
 mongoose.set('useNewUrlParser', true)
