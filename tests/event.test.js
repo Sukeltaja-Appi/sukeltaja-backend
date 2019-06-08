@@ -424,6 +424,7 @@ describe('more complex event tests', async () => {
 
     const users = await api
       .get(`${config.apiUrl}/users`)
+      .set('Authorization', `bearer ${token}`)
 
     const userObject = users.body.filter(user => user.username === 'SamiSukeltaja')
 
