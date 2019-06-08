@@ -1,6 +1,7 @@
 const userRouter = require('express').Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
+const requireAuthentication = require('../middleware/authenticate')
 
 // Returns all current events from database as JSON
 userRouter.all('*', requireAuthentication)
