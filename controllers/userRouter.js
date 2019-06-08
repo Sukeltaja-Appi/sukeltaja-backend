@@ -3,6 +3,7 @@ const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
 // Returns all current events from database as JSON
+userRouter.all('*', requireAuthentication)
 
 userRouter.get('/', async (req, res) => {
   try {
