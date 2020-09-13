@@ -10,7 +10,7 @@ script:
 services: mongodb
 env:
   global:
-    - TEST_MONGODB_URI="localhost:27017"
+    - TEST_MONGODB_URI="mongodb://localhost:27017"
     - API_URL=/api
     - TEST_PORT=3000
     - ROOT_URL=jotain

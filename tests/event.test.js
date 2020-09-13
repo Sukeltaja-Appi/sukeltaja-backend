@@ -17,9 +17,9 @@ beforeEach(async () => {
   eventsAtStart = await eventsInDb()
 })
 
-describe('basic event tests', async () => {
+describe('basic event tests', () => {
 
-  describe('an authorized user', async () => {
+  describe('an authorized user', () => {
 
     beforeAll(async () => {
       const events = await eventsInDb()
@@ -148,7 +148,7 @@ describe('basic event tests', async () => {
     })
   })
 
-  describe('an unauthorized user', async () => {
+  describe('an unauthorized user', () => {
     test('cannot retrieve all events', async () => {
       await api
         .get(`${config.apiUrl}/events`)
@@ -297,7 +297,7 @@ describe('basic event tests', async () => {
   })
 })
 
-describe('more complex event tests', async () => {
+describe('more complex event tests', () => {
   test('creator can set target for new event', async () => {
     const newEvent = {
 
@@ -412,7 +412,7 @@ describe('more complex event tests', async () => {
       .get(`${config.apiUrl}/dives`)
       .set('Authorization', `bearer ${token}`)
 
-    expect(allDives.body.length-1).toBe(divesAfter.body.length)
+    expect(allDives.body.length - 1).toBe(divesAfter.body.length)
   })
 
   test('creator can invite users to the event', async () => {
