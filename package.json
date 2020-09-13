@@ -9,7 +9,7 @@
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
-    "test-with-coverage": "cross-env NODE_ENV=test jest --coverage --verbose && cat ./coverage/lcov.info | codacy-coverage"
+    "test-with-coverage": "cross-env NODE_ENV=test jest --coverage --verbose --runInBand && cat ./coverage/lcov.info | codacy-coverage"
   },
   "author": "Sukeltaja-Tiimi",
   "license": "MIT",
