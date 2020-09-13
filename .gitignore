@@ -7,7 +7,6 @@ npm-debug.*
 *.mobileprovision
 coverage/
 .env*
-.vscode/
 
 # macOS
 .DS_Store
