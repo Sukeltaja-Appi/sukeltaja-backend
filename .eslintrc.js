@@ -15,10 +15,6 @@ module.exports = {
       "expect": true,
       "describe": true
     },
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
     "quotes": [
       "error", "single", { "avoidEscape": true }
     ],
