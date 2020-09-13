@@ -225,7 +225,7 @@ describe('basic event tests', () => {
 
   // // TODO: FIX proper status codes
 
-  describe('status codes', async () => {
+  describe('status codes', () => {
 
     beforeAll(async () => {
       nonExistingEventId = '5c8fc1d0f1aab62879b8c56d'
