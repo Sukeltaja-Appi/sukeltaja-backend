@@ -8,6 +8,7 @@
     "watch": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "lint": "eslint .",
+    "lintfix": "eslint . --fix",
     "test-with-coverage": "cross-env NODE_ENV=test jest --coverage --verbose && cat ./coverage/lcov.info | codacy-coverage"
   },
   "author": "Sukeltaja-Tiimi",
