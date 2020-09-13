@@ -126,7 +126,7 @@ const createIO = (server) => {
   io.newMessage = async (message) => {
     const msg = Message.format(message)
 
-    const sender = await User.findById(String(msg.sender))
+    const sender = await User.findById(msg.sender.id)
 
     msg.sender = { username: sender.username, _id: sender._id }
 

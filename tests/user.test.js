@@ -12,9 +12,9 @@ beforeAll(async () => {
   initialUsernames = Object.values(initialUsers).map(u => u.username)
 }, 30000)
 
-describe('User', async () => {
+describe('User', () => {
 
-  describe('with valid parameters', async () => {
+  describe('with valid parameters', () => {
     test('all users are returned', async () => {
       const response = await api
         .get(`${config.apiUrl}/users`)
@@ -69,7 +69,7 @@ describe('User', async () => {
     })
   })
 
-  describe('with invalid username', async () => {
+  describe('with invalid username', () => {
     test('a new user cannot be posted', async () => {
       const usersAtStart = await usersInDb()
 
@@ -113,7 +113,7 @@ describe('User', async () => {
     })
   })
 
-  describe('with invalid password', async () => {
+  describe('with invalid password', () => {
     test('a new user cannot be posted', async () => {
       const usersAtStart = await usersInDb()
 
