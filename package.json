@@ -13,27 +13,27 @@
   "author": "Sukeltaja-Tiimi",
   "license": "MIT",
   "dependencies": {
-    "bcrypt": "^3.0.3",
+    "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^6.2.0",
-    "events": "^3.0.0",
-    "express": "^4.16.4",
-    "jsonwebtoken": "^8.4.0",
-    "luxon": "^1.11.1",
-    "mongoose": "^5.4.6",
-    "mongoose-autopopulate": "^0.9.1",
-    "mongoose-unique-validator": "^2.0.2",
-    "nodemailer": "^6.1.0",
-    "socket.io": "^2.2.0"
+    "dotenv": "^8.2.0",
+    "events": "^3.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "luxon": "^1.25.0",
+    "mongoose": "^5.10.5",
+    "mongoose-autopopulate": "^0.12.2",
+    "mongoose-unique-validator": "^2.0.3",
+    "nodemailer": "^6.4.11",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
+    "babel-eslint": "^10.1.0",
     "codacy-coverage": "^3.4.0",
-    "cross-env": "^5.2.0",
-    "eslint": "^5.12.1",
-    "jest": "^23.6.0",
-    "nodemon": "^1.18.9",
-    "supertest": "^3.4.2"
+    "cross-env": "^7.0.2",
+    "eslint": "^7.9.0",
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
   },
   "jest": {
     "testEnvironment": "node"
