@@ -29,7 +29,8 @@ const initialTargets = [
     'type': 'Hylky',
     'depth': '17',
     'latitude': '59.95756592',
-    'longitude': '24.37135085'
+    'longitude': '24.37135085',
+    'user_created': 'false'
   }
 ]
 

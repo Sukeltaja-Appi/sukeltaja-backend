@@ -17,7 +17,10 @@ const targetSchema = new mongoose.Schema({
   hylyt_link: String,
   mj_id: String,
   mj_link: String,
-  user_created: Boolean
+  user_created: {
+    type: Boolean,
+    default: true
+  }
 })
 
 targetSchema.statics.format = (target) => {
