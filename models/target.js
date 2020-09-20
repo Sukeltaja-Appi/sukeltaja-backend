@@ -16,11 +16,16 @@ const targetSchema = new mongoose.Schema({
   hylyt_id: Number,
   hylyt_link: String,
   mj_id: String,
-  mj_link: String
+  mj_link: String,
+  user_created: {
+    type: Boolean,
+    default: true
+  }
 })
 
 targetSchema.statics.format = (target) => {
-  const { _id, name, latitude, longitude, type, depth, material, hylyt_id, hylyt_link, mj_id, mj_link } = target
+  const { _id, name, latitude, longitude, type, depth, material, hylyt_id, hylyt_link, mj_id, mj_link,
+    user_created } = target
 
   return {
     _id,
@@ -33,7 +38,8 @@ targetSchema.statics.format = (target) => {
     hylyt_id,
     hylyt_link,
     mj_id,
-    mj_link
+    mj_link,
+    user_created
   }
 }
 
