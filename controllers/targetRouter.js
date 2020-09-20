@@ -8,7 +8,7 @@ const linkToKyppi = (mj_id) => mj_id ? `${config.kyppiUrl}${mj_id}` : undefined
 targetRouter.get('/', async (req, res) => {
   try {
     const targets = await Target
-      .find({ user_created: false })
+      .find({ user_created: { $ne: true } })
 
     res.json(targets.map(Target.format))
   } catch (exception) {
