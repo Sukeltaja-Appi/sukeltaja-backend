@@ -342,7 +342,6 @@ describe('more complex event tests', () => {
     expect(response.body.target.name).toBe('Ruotohylky')
   })
 
-
   test('creator can set custom target for new event', async () => {
     const newEvent = {
       'title': 'Vuosijuhla',
@@ -361,11 +360,11 @@ describe('more complex event tests', () => {
     }
 
     const postTarget = await api
-        .post(`${config.apiUrl}/targets`)
-        .set('Authorization', `bearer ${token}`)
-        .send(newTarget)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+      .post(`${config.apiUrl}/targets`)
+      .set('Authorization', `bearer ${token}`)
+      .send(newTarget)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
     await api
       .post(`${config.apiUrl}/events`)
@@ -379,6 +378,7 @@ describe('more complex event tests', () => {
       .set('Authorization', `bearer ${token}`)
 
     const event = allEvents.body[1]
+
     event.target = postTarget.body
 
     await api
