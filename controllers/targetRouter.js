@@ -8,7 +8,7 @@ const linkToKyppi = (mj_id) => mj_id ? `${config.kyppiUrl}${mj_id}` : undefined
 targetRouter.get('/', async (req, res) => {
   try {
     const targets = await Target
-      .find({})
+      .find({ user_created: false })
 
     res.json(targets.map(Target.format))
   } catch (exception) {
@@ -23,7 +23,7 @@ targetRouter.all('*', requireAuthentication)
 
 targetRouter.post('/', async (req, res) => {
   try {
-    const { name, depth, latitude, longitude, hylyt_id, hylyt_link, mj_id } = req.body
+    const { name, depth, latitude, longitude, hylyt_id, hylyt_link, mj_id, user_created } = req.body
 
     if (!longitude || !latitude) {
       return res.status(400).json({ error: 'coordinates missing' })
@@ -37,7 +37,8 @@ targetRouter.post('/', async (req, res) => {
       hylyt_id,
       hylyt_link,
       mj_id,
-      mj_link: linkToKyppi(mj_id)
+      mj_link: linkToKyppi(mj_id),
+      user_created
     })
 
     const savedTarget = await target.save()
