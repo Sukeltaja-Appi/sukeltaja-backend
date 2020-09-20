@@ -342,6 +342,59 @@ describe('more complex event tests', () => {
     expect(response.body.target.name).toBe('Ruotohylky')
   })
 
+
+  test('creator can set custom target for new event', async () => {
+    const newEvent = {
+      'title': 'Vuosijuhla',
+      'startdate': '2019-02-15T13:03:22.014Z',
+      'enddate': '2019-02-15T14:12:25.128Z',
+      'target': null,
+      'dives': [],
+    }
+
+    const newTarget = {
+      'name': 'Juhlapaikka',
+      'type': 'Hylky',
+      'depth': '0',
+      'latitude': '60',
+      'longitude': '24',
+    }
+
+    const postTarget = await api
+        .post(`${config.apiUrl}/targets`)
+        .set('Authorization', `bearer ${token}`)
+        .send(newTarget)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    await api
+      .post(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+      .send(newEvent)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const allEvents = await api
+      .get(`${config.apiUrl}/events`)
+      .set('Authorization', `bearer ${token}`)
+
+    const event = allEvents.body[1]
+    event.target = postTarget.body
+
+    await api
+      .put(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send(event)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api
+      .get(`${config.apiUrl}/events/${event._id}`)
+      .set('Authorization', `bearer ${token}`)
+
+    expect(response.body.target.name).toBe('Juhlapaikka')
+  })
+
   test('creator can add dives to the event', async () => {
     const allEvents = await api
       .get(`${config.apiUrl}/events`)
