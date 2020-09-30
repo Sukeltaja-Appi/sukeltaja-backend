@@ -31,8 +31,9 @@ const userSchema = new mongoose.Schema({
   }
 })
 
-userSchema.plugin(uniqueValidator, { message: 'Käyttäjätunnus on jo käytössä' })
-
+userSchema.pre('validate', function () {
+  userSchema.plugin(uniqueValidator, { message: 'Käyttäjätunnus on jo käytössä' })
+})
 
 userSchema.statics.format = (user) => {
   const { _id, username, events, dives, messages } = user
