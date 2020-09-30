@@ -6,16 +6,33 @@ const { ObjectId } = mongoose.Schema.Types
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true
+    unique: true,
+    minlength: [3, 'minimipituus 3'],
+    maxlength: 200
   },
-  password: String,
+  password: {
+    type: String,
+    minlength: [6, 'minimipituus 6'],
+    maxlength: 200
+  },
   events: [{ type: ObjectId, ref: 'Event' }],
   dives: [{ type: ObjectId, ref: 'Dive' }],
   messages: [{ type: ObjectId, ref: 'Message' }],
-  email: String
+  email: {
+    type: String
+    ,
+    max: 100,
+    validate: {
+      validator: function (emailtest) {
+        return /^.*@.*/.test(emailtest)
+      },
+      message: props => `${props.value} muoto x@x.x`
+    }
+  }
 })
 
-userSchema.plugin(uniqueValidator)
+userSchema.plugin(uniqueValidator, { message: 'Käyttäjätunnus on jo käytössä' })
+
 
 userSchema.statics.format = (user) => {
   const { _id, username, events, dives, messages } = user
