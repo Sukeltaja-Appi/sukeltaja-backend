@@ -9,15 +9,20 @@ userRouter.post('/', async (req, res) => {
     username: Joi.string().min(3).max(200),
     password: Joi.string().min(6).max(200),
     email: Joi.string().email(),
-  }).options({ presence: 'required', abortEarly: false })
+  }).options({
+    presence: 'required',
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: true
+  })
 
-  const { error } = joiSchema.validate(req.body)
+  const { value: validatedBody, error } = joiSchema.validate(req.body)
 
   if (error)
     return res.status(400).json({ error: error.message })
 
   try {
-    const body = req.body
+    const body = validatedBody
 
     if (!body.username || !body.password || !body.email) {
       return res.status(400).json({ error: 'username or password missing' })
