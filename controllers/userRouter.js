@@ -5,28 +5,16 @@ const { requireAuthentication } = require('../middleware/authenticate')
 const Joi = require('joi')
 
 userRouter.post('/', async (req, res) => {
-  try {
-    const joiSchema = Joi.object({
-      username: Joi.string()
-        .min(3)
-        .max(200),
+  const joiSchema = Joi.object({
+    username: Joi.string().min(3).max(200),
+    password: Joi.string().min(6).max(200),
+    email: Joi.string().email(),
+  }).options({ presence: 'required', abortEarly: false })
 
-      password: Joi.string()
-        .min(6)
-        .max(200),
+  const { error } = joiSchema.validate(req.body)
 
-      email: Joi.string()
-        .email(),
-
-      passwordVerification: Joi.string()
-    })
-      .options({presence: 'required', abortEarly: false})
-
-    await joiSchema.validateAsync(req.body)
-
-  } catch (err) {
-    return res.status(400).json({ error: 'validation not passed' })
-  }
+  if (error)
+    return res.status(400).json({ error: error.message })
 
   try {
     const body = req.body
