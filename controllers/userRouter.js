@@ -9,8 +9,7 @@ userRouter.post('/', async (req, res) => {
     const joiSchema = Joi.object({
       username: Joi.string()
         .min(3)
-        .max(200)
-        .required(),
+        .max(200),
 
       password: Joi.string()
         .min(6)
@@ -19,11 +18,11 @@ userRouter.post('/', async (req, res) => {
       email: Joi.string()
         .email(),
 
-      passwordVerification: Joi.ref('password')
+      passwordVerification: Joi.string()
     })
-      .with('password', 'passwordVerification')
+      .options({presence: 'required', abortEarly: false})
 
-    await joiSchema.validateAsync(req.body, { abortEarly: false })
+    await joiSchema.validateAsync(req.body)
 
   } catch (err) {
     return res.status(400).json({ error: 'validation not passed' })

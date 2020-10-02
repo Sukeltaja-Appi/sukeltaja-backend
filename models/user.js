@@ -7,33 +7,17 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
-    minlength: [3, 'minimipituus 3'],
-    maxlength: 200
   },
   password: {
     type: String,
-    minlength: [6, 'minimipituus 6'],
-    maxlength: 200
   },
   events: [{ type: ObjectId, ref: 'Event' }],
   dives: [{ type: ObjectId, ref: 'Dive' }],
   messages: [{ type: ObjectId, ref: 'Message' }],
-  email: {
-    type: String
-    ,
-    max: 100,
-    validate: {
-      validator: function (emailtest) {
-        return /^.*@.*/.test(emailtest)
-      },
-      message: props => `${props.value} muoto x@x.x`
-    }
-  }
+  email: String,
 })
 
-userSchema.pre('validate', function () {
-  userSchema.plugin(uniqueValidator)
-})
+userSchema.plugin(uniqueValidator)
 
 userSchema.statics.format = (user) => {
   const { _id, username, events, dives, messages } = user
