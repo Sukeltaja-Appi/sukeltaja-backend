@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.pre('validate', function () {
-  userSchema.plugin(uniqueValidator, { message: 'Käyttäjätunnus on jo käytössä' })
+  userSchema.plugin(uniqueValidator)
 })
 
 userSchema.statics.format = (user) => {
