@@ -26,11 +26,6 @@ userRouter.post('/', async (req, res) => {
     await joiSchema.validateAsync(req.body, { abortEarly: false })
 
   } catch (err) {
-    console.log(err)
-    console.log('----------------')
-    console.log(err.details)
-    console.log('---------------- return')
-
     return res.status(400).json({ error: 'validation not passed' })
   }
 
