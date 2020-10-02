@@ -135,6 +135,35 @@ describe('User', () => {
       expect(usersAtStart).toEqual(usersAfterOperation)
     })
   })
+
+  test('witout email a new user cannot be created', async () => {
+    const newUser = {
+      username: 'JoukoJäämies',
+      password: '234234Salasana',
+      email: ''
+    }
+
+    await api
+      .post(`${config.apiUrl}/users`)
+      .set('Authorization', `bearer ${token}`)
+      .send(newUser)
+      .expect(400)
+  })
+
+  test('registeration succeeds with extra passwordVerification field', async () => {
+    const newUser = {
+      username: 'JoukoJäämies',
+      password: '234234Salasana',
+      passwordVerification: '234234Salasana',
+      email: 'eitoimiva@email.com',
+    }
+
+    await api
+      .post(`${config.apiUrl}/users`)
+      .set('Authorization', `bearer ${token}`)
+      .send(newUser)
+      .expect(200)
+  })
 })
 
 afterAll(async () => {
