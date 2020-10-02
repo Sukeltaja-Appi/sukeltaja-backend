@@ -2,10 +2,27 @@ const userRouter = require('express').Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const { requireAuthentication } = require('../middleware/authenticate')
+const Joi = require('joi')
 
 userRouter.post('/', async (req, res) => {
+  const joiSchema = Joi.object({
+    username: Joi.string().min(3).max(200),
+    password: Joi.string().min(6).max(200),
+    email: Joi.string().email(),
+  }).options({
+    presence: 'required',
+    abortEarly: false,
+    allowUnknown: true,
+    stripUnknown: true
+  })
+
+  const { value: validatedBody, error } = joiSchema.validate(req.body)
+
+  if (error)
+    return res.status(400).json({ error: error.message })
+
   try {
-    const body = req.body
+    const body = validatedBody
 
     if (!body.username || !body.password || !body.email) {
       return res.status(400).json({ error: 'username or password missing' })
@@ -28,7 +45,7 @@ userRouter.post('/', async (req, res) => {
 
   } catch (exception) {
     console.log(exception._message)
-    if (exception.message.includes('User validation failed')){
+    if (exception.message.includes('User validation failed')) {
       res.status(400).json({ error: 'username not unique' })
     } else {
       res.status(500).json({ error: 'something went wrong...' })
