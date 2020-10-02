@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 const { requireAuthentication } = require('../middleware/authenticate')
 const Joi = require('joi')
 
-userRouter.post('/', async (req, res, next) => {
+userRouter.post('/', async (req, res) => {
   try {
     const joiSchema = Joi.object({
       username: Joi.string()
@@ -30,6 +30,7 @@ userRouter.post('/', async (req, res, next) => {
     console.log('----------------')
     console.log(err.details)
     console.log('---------------- return')
+
     return res.status(400).json({ error: 'validation not passed' })
   }
 
