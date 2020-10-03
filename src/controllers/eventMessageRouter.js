@@ -19,7 +19,7 @@ eventMessageRouter.get('/', asyncRouteWrapper(async (req, res) => {
 eventMessageRouter.post('/', asyncRouteWrapper(async (req, res) => {
   try {
     const { text, created, event } = req.body
-    var { user } = res.locals
+    const { user } = res.locals
 
     if (!event || !created || !text) {
       return res.status(400).json({ error: 'missing fields' })
@@ -88,7 +88,7 @@ eventMessageRouter.put('/:id', asyncRouteWrapper(async (req, res) => {
   }
   const eventMessage = await EventMessage.findById(req.params.id)
   const eventMessageUser = eventMessage.user
-  var { user } = res.locals
+  const { user } = res.locals
 
   if (!user._id.equals(eventMessageUser._id)) {
     return res.status(401).json({ error: 'unauthorized request' })

@@ -54,7 +54,7 @@ messageRouter.post('/', asyncRouteWrapper(async (req, res) => {
   const savedMessage = await message.save()
 
   for (let i = 0; i < receivers.length; i++) {
-    var receiver = await User.findById(receivers[i])
+    const receiver = await User.findById(receivers[i])
 
     receiver.messages = receiver.messages.concat(savedMessage.id)
 

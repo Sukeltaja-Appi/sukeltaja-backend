@@ -32,7 +32,7 @@ BOuserRouter.put('/', asyncRouteWrapper(async (req, res) => {
   }
 
   if (res.locals.user.admin) {
-    var newAdminRole
+    let newAdminRole
 
     if (bouser._id.equals(res.locals.user.id)) {
       newAdminRole = true
