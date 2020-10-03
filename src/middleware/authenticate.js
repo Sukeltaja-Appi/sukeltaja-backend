@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const BOUser = require('../models/bouser')
+const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
 
 const getTokenFrom = (req) => {
   const authorization = req.get('authorization')
@@ -12,21 +13,12 @@ const getTokenFrom = (req) => {
   return null
 }
 
-const requireBoAuthentication = async (req, res, next) => {
+const requireBoAuthentication = asyncRouteWrapper(async (req, res) => {
+  if (res.headersSent)
+    return
+
   const token = getTokenFrom(req)
-  let decodedToken = null
-
-  try {
-    decodedToken = jwt.verify(token, process.env.SECRET)
-  } catch (exception) {
-    if (exception.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: exception.message })
-    } else {
-      console.log(exception)
-
-      return res.status(500).json({ error: 'something went wrong...' })
-    }
-  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
 
   if (!token || !decodedToken.id) {
     return res.status(401).json({ error: 'token missing or invalid' })
@@ -38,25 +30,14 @@ const requireBoAuthentication = async (req, res, next) => {
     return res.status(401).json({ error: 'token missing or invalid' })
   }
   res.locals.user = bouser
+})
 
-  next()
-}
+const requireAuthentication = asyncRouteWrapper(async (req, res) => {
+  if (res.headersSent)
+    return
 
-const requireAuthentication = async (req, res, next) => {
   const token = getTokenFrom(req)
-  let decodedToken = null
-
-  try {
-    decodedToken = jwt.verify(token, process.env.SECRET)
-  } catch (exception) {
-    if (exception.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: exception.message })
-    } else {
-      console.log(exception)
-
-      return res.status(500).json({ error: 'something went wrong...' })
-    }
-  }
+  const decodedToken = jwt.verify(token, process.env.SECRET)
 
   if (!token || !decodedToken.id) {
     return res.status(401).json({ error: 'token missing or invalid' })
@@ -68,12 +49,10 @@ const requireAuthentication = async (req, res, next) => {
     return res.status(401).json({ error: 'token missing or invalid' })
   }
   res.locals.user = user
-
-  next()
-}
+})
 
 const getTokenFromSocket = (data) => {
-  if(data && data.headers && data.headers.Authorization) {
+  if (data && data.headers && data.headers.Authorization) {
     const authorization = data.headers.Authorization
 
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {

@@ -5,26 +5,20 @@ const { requireAuthentication } = require('../middleware/authenticate')
 const { userIsInArray } = require('../utils/userHandler')
 const { dbObjectsInUse, sleep } = require('./DBSynchronizationController')
 const Event = require('../models/event')
+const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
 
 // From here on require authentication on all routes.
 diveRouter.all('*', requireAuthentication)
 
-diveRouter.get('/', async (req, res) => {
-  try {
-    const dives = await Dive
-      .find({})
-      .where('user').equals(res.locals.user.id)
+diveRouter.get('/', asyncRouteWrapper(async (req, res) => {
+  const dives = await Dive
+    .find({})
+    .where('user').equals(res.locals.user.id)
 
-    res.json(dives.map(Dive.format))
-  } catch (exception) {
-    console.log(exception)
+  res.json(dives.map(Dive.format))
+}))
 
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-
-})
-
-diveRouter.post('/', async (req, res) => {
+diveRouter.post('/', asyncRouteWrapper(async (req, res) => {
   try {
     const { startdate, enddate, event, latitude, longitude } = req.body
     const diveUser = req.body.user
@@ -58,8 +52,9 @@ diveRouter.post('/', async (req, res) => {
     user.dives = user.dives.concat(savedDive.id)
     await user.save()
 
+    // FIXME: Either use real transactions or just add the even in atomic db query
     // Synchronized block starts. ---------------------
-    while(dbObjectsInUse[event]) await sleep(0.01)
+    while (dbObjectsInUse[event]) await sleep(0.01)
     dbObjectsInUse[event] = true
 
     const diveEvent = await Event.findById(event)
@@ -80,18 +75,17 @@ diveRouter.post('/', async (req, res) => {
       const { event } = req.body
 
       delete dbObjectsInUse[event]
-    } catch(e) {console.log(e)}
+    } catch (e) { console.log(e) }
     // semaphore reset ends. ---------------------
 
     console.log(exception)
 
     return res.status(500).json({ error: 'something went wrong...' })
   }
-})
+}))
 
-diveRouter.delete('/:id', async (req, res) => {
+diveRouter.delete('/:id', asyncRouteWrapper(async (req, res) => {
   try {
-
     const dive = await Dive.findById(req.params.id)
     const eventID = dive.event
 
@@ -102,45 +96,36 @@ diveRouter.delete('/:id', async (req, res) => {
   } catch (exception) {
     res.status(400).send({ error: 'malformatted id' })
   }
-})
+}))
 
-diveRouter.put('/:id', async (req, res) => {
-  try {
-    const { startdate, enddate, event, latitude, longitude } = req.body
+diveRouter.put('/:id', asyncRouteWrapper(async (req, res) => {
+  const { startdate, enddate, event, latitude, longitude } = req.body
 
-    if (!startdate || !enddate || !event) {
-      return res.status(400).json({ error: 'missing fields' })
-    }
-    const dive = await Dive.findById(req.params.id)
-    const diveUser = dive.user
-    var { user } = res.locals
+  if (!startdate || !enddate || !event) {
+    return res.status(400).json({ error: 'missing fields' })
+  }
+  const dive = await Dive.findById(req.params.id)
+  const diveUser = dive.user
+  var { user } = res.locals
 
-    if (!user._id.equals(diveUser._id)) {
-      const fetchedEvent = await Event.findById(event)
+  if (!user._id.equals(diveUser._id)) {
+    const fetchedEvent = await Event.findById(event)
 
-      if (!fetchedEvent.creator._id.equals(user._id)
-        && !userIsInArray(user, fetchedEvent.admins)) {
-        return res.status(401).json({ error: 'unauthorized request' })
-      }
-    }
-
-    const updatedDive = await Dive.findByIdAndUpdate(
-      req.params.id,
-      { startdate, enddate, event, latitude, longitude },
-      { new: true }
-    )
-
-    res.json(Dive.format(updatedDive))
-
-    req.io.updateEventAll(updatedDive.event)
-
-  } catch (exception) {
-    if (exception.name === 'JsonWebTokenError') {
-      res.status(401).json({ error: exception.message })
-    } else {
-      console.log(exception)
-      res.status(500).json({ error: 'something went wrong...' })
+    if (!fetchedEvent.creator._id.equals(user._id)
+      && !userIsInArray(user, fetchedEvent.admins)) {
+      return res.status(401).json({ error: 'unauthorized request' })
     }
   }
-})
+
+  const updatedDive = await Dive.findByIdAndUpdate(
+    req.params.id,
+    { startdate, enddate, event, latitude, longitude },
+    { new: true }
+  )
+
+  res.json(Dive.format(updatedDive))
+
+  req.io.updateEventAll(updatedDive.event)
+}))
+
 module.exports = diveRouter
