@@ -4,11 +4,16 @@ const bcrypt = require('bcrypt')
 const { requireAuthentication } = require('../middleware/authenticate')
 const Joi = require('joi')
 const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
+const { validation: validationConfig, saltRounds } = require('../utils/config')
 
 userRouter.post('/', asyncRouteWrapper(async (req, res) => {
   const joiSchema = Joi.object({
-    username: Joi.string().min(3).max(200),
-    password: Joi.string().min(6).max(200),
+    username: Joi.string()
+      .min(validationConfig.usernameLength.min)
+      .max(validationConfig.usernameLength.max),
+    password: Joi.string()
+      .min(validationConfig.passwordLength.min)
+      .max(validationConfig.passwordLength.max),
     email: Joi.string().email(),
   }).options({
     presence: 'required',
