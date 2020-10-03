@@ -1,7 +1,7 @@
-const User = require('../../models/user')
-const Event = require('../../models/event')
-const Dive = require('../../models/dive')
-const Target = require('../../models/target')
+const User = require('../../src/models/user')
+const Event = require('../../src/models/event')
+const Dive = require('../../src/models/dive')
+const Target = require('../../src/models/target')
 const { initialUsers, initialEvents, initialTargets, initialDives, nonExistingEventId } = require('./initialData')
 const { login, post } = require('./helperFunctions')
 

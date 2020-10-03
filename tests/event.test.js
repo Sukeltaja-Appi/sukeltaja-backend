@@ -1,7 +1,7 @@
 const supertest = require('supertest')
-const { app, server } = require('../index')
+const { app, server } = require('../src/index')
 const api = supertest(app)
-const config = require('../utils/config')
+const config = require('../src/utils/config')
 const { eventsInDb, initializeDb, login, getIdFromUsername } = require('./helpers/testHelper')
 const { initialEvents, initialUsers } = require('./helpers/initialData')
 

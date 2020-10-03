@@ -1,7 +1,7 @@
 const eventMessageRouter = require('express').Router()
 const EventMessage = require('../models/eventMessage')
 const { requireAuthentication } = require('../middleware/authenticate')
-const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
+const { dbObjectsInUse, sleep } = require('./DBSynchronizationController')
 const Event = require('../models/event')
 
 // From here on require authentication on all routes.

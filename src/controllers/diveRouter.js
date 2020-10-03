@@ -3,7 +3,7 @@ const Dive = require('../models/dive')
 const User = require('../models/user')
 const { requireAuthentication } = require('../middleware/authenticate')
 const { userIsInArray } = require('../utils/userHandler')
-const { dbObjectsInUse, sleep } = require('../controllers/DBSynchronizationController')
+const { dbObjectsInUse, sleep } = require('./DBSynchronizationController')
 const Event = require('../models/event')
 
 // From here on require authentication on all routes.

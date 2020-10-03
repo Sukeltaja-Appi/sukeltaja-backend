@@ -1,7 +1,7 @@
 const supertest = require('supertest')
-const { app, server } = require('../index')
+const { app, server } = require('../src/index')
 const api = supertest(app)
-const config = require('../utils/config')
+const config = require('../src/utils/config')
 const { initialUsers, initializeDb, usersInDb, login } = require('./helpers/testHelper.js')
 
 let token, initialUsernames
