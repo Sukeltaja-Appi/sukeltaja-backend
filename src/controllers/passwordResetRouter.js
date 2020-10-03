@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const config = require('../utils/config')
 const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
+const { saltRounds } = require('../utils/config')
 
 const htmlForm = (text) => {
   return (`<body>
@@ -39,7 +40,6 @@ pwResetRouter.post('/:id', asyncRouteWrapper(async (req, res) => {
   console.log(reset.username)
 
   const user = await User.findOne({ username: reset.username }, { username: 1 })
-  const saltRounds = 10
   const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
 
   await User.findByIdAndUpdate(

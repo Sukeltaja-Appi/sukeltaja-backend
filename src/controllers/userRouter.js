@@ -34,9 +34,7 @@ userRouter.post('/', asyncRouteWrapper(async (req, res) => {
       return res.status(400).json({ error: 'username or password missing' })
     }
 
-    const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
-
     const user = new User({
       username: body.username,
       password: passwordHash,

@@ -3,6 +3,7 @@ const BOUser = require('../models/bouser')
 const bcrypt = require('bcrypt')
 const { requireBoAuthentication } = require('../middleware/authenticate')
 const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
+const { saltRounds } = require('../utils/config')
 
 // Returns all current events from database as JSON
 BOuserRouter.all('*', requireBoAuthentication)
@@ -24,14 +25,10 @@ BOuserRouter.put('/', asyncRouteWrapper(async (req, res) => {
   if (!bouser) {
     return res.status(400).json({ error: 'wrong username' })
   }
-  var passwordHash
+  let passwordHash = bouser.password
 
   if (req.body.password) {
-    const saltRounds = 10
-
     passwordHash = await bcrypt.hash(req.body.password, saltRounds)
-  } else {
-    passwordHash = bouser.password
   }
 
   if (res.locals.user.admin) {
@@ -90,9 +87,7 @@ BOuserRouter.post('/', asyncRouteWrapper(async (req, res) => {
     return res.status(400).json({ error: 'missing fields' })
   }
 
-  const saltRounds = 10
   const passwordHash = await bcrypt.hash(body.password, saltRounds)
-
   const BOuser = new BOUser({
     username: body.username,
     password: passwordHash,
