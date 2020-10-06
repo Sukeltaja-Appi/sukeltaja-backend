@@ -13,11 +13,11 @@ let emailPW = process.env.SERVICE_EMAIL_PASSWORD
 
 let validation = {
   usernameLength: {
-    min: process.env === 'development' ? 0 : 3,
+    min: process.env.NODE_ENV === 'development' ? 0 : 3,
     max: 200,
   },
   passwordLength: {
-    min: process.env === 'development' ? 0 : 6,
+    min: process.env.NODE_ENV === 'development' ? 0 : 6,
     max: 200,
   },
 }
