@@ -16,6 +16,7 @@ const messageRouter = require('./controllers/messageRouter')
 const BOuserRouter = require('./controllers/BOuserRouter')
 const pwResetRouter = require('./controllers/passwordResetRouter')
 const { createIO } = require('./controllers/webSocketController')
+const errorHandler = require('./middleware/errorHandler')
 
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
@@ -26,7 +27,7 @@ mongoose
   .then(() => {
     console.log('connected to databases', config.mongoUrl)
   })
-  .catch( err => {
+  .catch(err => {
     console.log(err)
   })
 
@@ -58,6 +59,7 @@ app.use(`${config.apiUrl}/eventMessages`, eventMessageRouter)
 app.use(`${config.apiUrl}/messages`, messageRouter)
 app.use(`${config.apiUrl}/bousers`, BOuserRouter)
 app.use(`${config.apiUrl}/reset`, pwResetRouter)
+app.use(errorHandler)
 
 server.listen(config.port, () => {
   console.log(`Server running on port ${config.port}`)

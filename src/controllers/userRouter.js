@@ -3,11 +3,17 @@ const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const { requireAuthentication } = require('../middleware/authenticate')
 const Joi = require('joi')
+const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
+const { validation: validationConfig, saltRounds } = require('../utils/config')
 
-userRouter.post('/', async (req, res) => {
+userRouter.post('/', asyncRouteWrapper(async (req, res) => {
   const joiSchema = Joi.object({
-    username: Joi.string().min(3).max(200),
-    password: Joi.string().min(6).max(200),
+    username: Joi.string()
+      .min(validationConfig.usernameLength.min)
+      .max(validationConfig.usernameLength.max),
+    password: Joi.string()
+      .min(validationConfig.passwordLength.min)
+      .max(validationConfig.passwordLength.max),
     email: Joi.string().email(),
   }).options({
     presence: 'required',
@@ -28,9 +34,7 @@ userRouter.post('/', async (req, res) => {
       return res.status(400).json({ error: 'username or password missing' })
     }
 
-    const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
-
     const user = new User({
       username: body.username,
       password: passwordHash,
@@ -51,50 +55,38 @@ userRouter.post('/', async (req, res) => {
       res.status(500).json({ error: 'something went wrong...' })
     }
   }
-})
+}))
 
 // Returns all current events from database as JSON
 userRouter.all('*', requireAuthentication)
 
-userRouter.get('/', async (req, res) => {
-  try {
-    const users = await User
-      .find({})
+userRouter.get('/', asyncRouteWrapper(async (req, res) => {
+  const users = await User
+    .find({})
 
-    res.json(users.map(User.format))
-  } catch (exception) {
-    console.log(exception)
+  res.json(users.map(User.format))
+}))
 
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
+userRouter.get('/names', asyncRouteWrapper(async (req, res) => {
+  const users = await User
+    .find({})
 
-userRouter.get('/names', async (req, res) => {
-  try {
-    const users = await User
-      .find({})
+  const formattedUsers = []
 
-    const formattedUsers = []
-
-    users.forEach(u => {
-      formattedUsers.push({
-        _id: u._id,
-        username: u.username
-      })
+  users.forEach(u => {
+    formattedUsers.push({
+      _id: u._id,
+      username: u.username
     })
+  })
 
-    res.json(formattedUsers)
-  } catch (exception) {
-    console.log(exception)
+  res.json(formattedUsers)
+}))
 
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
-
-userRouter.get('/:id', async (req, res) => {
+userRouter.get('/:id', asyncRouteWrapper(async (req, res) => {
   const user = await User.findById(req.params.id)
 
   res.json(User.format(user))
-})
+}))
 
 module.exports = userRouter

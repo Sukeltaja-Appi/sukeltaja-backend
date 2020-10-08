@@ -1,7 +1,7 @@
 const supertest = require('supertest')
-const { app } = require('../../index')
+const { app } = require('../../src/index')
 const api = supertest(app)
-const config = require('../../utils/config')
+const config = require('../../src/utils/config')
 const { initialUsers } = require('./initialData')
 
 // Log in and return a token.

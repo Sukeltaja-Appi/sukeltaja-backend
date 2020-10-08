@@ -4,6 +4,8 @@ const Reset = require('../models/reset')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const config = require('../utils/config')
+const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
+const { saltRounds } = require('../utils/config')
 
 const htmlForm = (text) => {
   return (`<body>
@@ -13,58 +15,45 @@ const htmlForm = (text) => {
           </body>`)
 }
 
-pwResetRouter.get('/:id', async (req, res) => {
-  try {
-    const reset = await Reset.findById(req.params.id)
+pwResetRouter.get('/:id', asyncRouteWrapper(async (req, res) => {
+  const reset = await Reset.findById(req.params.id)
 
-    if (!reset) {
-      return res.status(404).send(htmlForm('<h2>Linkki on vanhentunut</h2>'))
-    }
+  if (!reset) {
+    return res.status(404).send(htmlForm('<h2>Linkki on vanhentunut</h2>'))
+  }
 
-    res.send(htmlForm(`<h1>Salasanan vaihtaminen</h1>
+  res.send(htmlForm(`<h1>Salasanan vaihtaminen</h1>
             <form action="/api/reset/${req.params.id}" method="post">
               Anna uusi salasana:<br>
               <input type="text" name="password">
               <button type="submit">Päivitä</button>
             </form>`))
-  } catch (exception) {
-    console.log(exception)
+}))
 
-    return res.status(500).json({ error: 'something went wrong...' })
+pwResetRouter.post('/:id', asyncRouteWrapper(async (req, res) => {
+  const reset = await Reset.findById(req.params.id)
+
+  if (!reset) {
+    return res.status(404).send(htmlForm('<h2>Linkki on vanhentunut<h2>'))
   }
-})
+  console.log(req.body.password)
+  console.log(reset.username)
 
-pwResetRouter.post('/:id', async (req, res) => {
-  try {
-    const reset = await Reset.findById(req.params.id)
+  const user = await User.findOne({ username: reset.username }, { username: 1 })
+  const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
 
-    if (!reset) {
-      return res.status(404).send(htmlForm('<h2>Linkki on vanhentunut<h2>'))
-    }
-    console.log(req.body.password)
-    console.log(reset.username)
+  await User.findByIdAndUpdate(
+    user._id,
+    { password: passwordHash },
+    { new: true }
+  )
 
-    const user = await User.findOne({ username: reset.username }, { username: 1 })
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(req.body.password, saltRounds)
+  await Reset.findByIdAndDelete(reset._id)
 
-    await User.findByIdAndUpdate(
-      user._id,
-      { password: passwordHash },
-      { new: true }
-    )
+  return res.status(200).send(htmlForm('<h2>Salasanasi on nyt vaihdettu<h2>'))
+}))
 
-    await Reset.findByIdAndDelete(reset._id)
-
-    return res.status(200).send(htmlForm('<h2>Salasanasi on nyt vaihdettu<h2>'))
-  } catch (exception) {
-    console.log(exception)
-
-    return res.status(500).json({ error: 'something went wrong...' })
-  }
-})
-
-pwResetRouter.post('/', async (req, res) => {
+pwResetRouter.post('/', asyncRouteWrapper(async (req, res) => {
   try {
     const body = req.body
 
@@ -124,6 +113,6 @@ pwResetRouter.post('/', async (req, res) => {
       res.status(500).json({ error: 'something went wrong...' })
     }
   }
-})
+}))
 
 module.exports = pwResetRouter

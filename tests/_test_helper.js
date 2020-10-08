@@ -1,11 +1,11 @@
 const supertest = require('supertest')
 const { app } = require('../index')
 const api = supertest(app)
-const User = require('../models/user')
-const Event = require('../models/event')
-const Dive = require('../models/dive')
-const Target = require('../models/target')
-const config = require('../utils/config')
+const User = require('../src/models/user')
+const Event = require('../src/models/event')
+const Dive = require('../src/models/dive')
+const Target = require('../src/models/target')
+const config = require('../src/utils/config')
 
 // Initial objects in DB
 const userObject = {

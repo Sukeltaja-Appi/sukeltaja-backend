@@ -11,6 +11,19 @@ let rootUrl = process.env.ROOT_URL
 let email = process.env.SERVICE_EMAIL
 let emailPW = process.env.SERVICE_EMAIL_PASSWORD
 
+let validation = {
+  usernameLength: {
+    min: process.env.NODE_ENV === 'development' ? 0 : 3,
+    max: 200,
+  },
+  passwordLength: {
+    min: process.env.NODE_ENV === 'development' ? 0 : 6,
+    max: 200,
+  },
+}
+
+let saltRounds = 10
+
 if (process.env.NODE_ENV === 'test') {
   port = process.env.TEST_PORT
   mongoUrl = process.env.TEST_MONGODB_URI
@@ -23,5 +36,7 @@ module.exports = {
   port,
   email,
   emailPW,
-  rootUrl
+  rootUrl,
+  validation,
+  saltRounds,
 }
