@@ -1,0 +1,27 @@
+# File is just to give an example of what variables the program needs
+# Before running your own backend create file .env
+#
+# Information might not be all inclusive since this example has been done by second development team
+
+# node_env: if 'development' name and password minlengths are removed
+# node_env: if 'production' then at config.js: require('dotenv').config
+# node_env: if 'test' then port and mongoUrl = test_port and test_mongodb
+NODE_ENV='something'
+
+# check your own values, example mongodb is default after install
+PORT=3000
+MONGODB_URI="mongodb://localhost:27017"
+KYPPI_URL="https://www.kyppi.fi/to.aspx?id=112."
+API_URL="/api"
+ROOT_URL="localhost"
+
+# Used for nodemailer when resetting password (afaik)
+SERVICE_EMAIL="test@test.com"
+SERVICE_EMAIL_PASSWORD="testpassword"
+
+# change as needed
+TEST_PORT=3000
+TEST_MONGODB_URI="mongodb://localhost:27017/testiDb"
+
+# used for authentication tokens (afaik)
+SECRET="salainen"
