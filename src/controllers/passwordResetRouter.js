@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer')
 const config = require('../utils/config')
 const asyncRouteWrapper = require('../utils/asyncRouteWrapper')
 const { saltRounds } = require('../utils/config')
+const { requireAuthentication } = require('../middleware/authenticate')
 
 const htmlForm = (text) => {
   return (`<body>
@@ -113,6 +114,30 @@ pwResetRouter.post('/', asyncRouteWrapper(async (req, res) => {
       res.status(500).json({ error: 'something went wrong...' })
     }
   }
+}))
+
+pwResetRouter.all('*', requireAuthentication)
+
+pwResetRouter.put('/change', asyncRouteWrapper(async (req, res) => {
+  const user = await User.findById(res.locals.user.id)
+
+  const passwordCorrect = !user
+    ? false
+    : await bcrypt.compare(req.body.currentPassword, user.password)
+
+  if (!(user && passwordCorrect)) {
+    return res.status(401).json({ error: 'wrong password or problem with user information' })
+  }
+
+  const passwordHash = await bcrypt.hash(req.body.newPassword, saltRounds)
+
+  await User.findByIdAndUpdate(
+    user._id,
+    { password: passwordHash },
+    { new: true }
+  )
+
+  return res.status(200).json({ success: 'password is changed' })
 }))
 
 module.exports = pwResetRouter
